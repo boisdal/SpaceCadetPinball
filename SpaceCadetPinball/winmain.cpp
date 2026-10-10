@@ -13,6 +13,7 @@
 #include "font_selection.h"
 #ifdef PINBALL_CADENCE_AUDIT
 #include "../tools/cadence_probe.h"
+#include "../tools/cadence_replay.h"
 #endif
 
 constexpr const char* winmain::Version;
@@ -163,7 +164,10 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 		ImGuiIO& io = ImGui::GetIO();
 		ImIO = &io;
 		auto iniPath = std::string(prefPath) + "imgui_pb.ini";
-		io.IniFilename = iniPath.c_str();
+		#ifdef PINBALL_CADENCE_AUDIT
+        if (const char* auditIni = std::getenv("PINBALL_AUDIT_INI")) iniPath = auditIni;
+#endif
+        io.IniFilename = iniPath.c_str();
 
 		// First option initialization step: just load settings from .ini. Needs ImGui context.
 		options::InitPrimary();
@@ -299,6 +303,7 @@ void winmain::MainLoop()
 {
 #ifdef PINBALL_CADENCE_AUDIT
 	CadenceProbe cadence;
+    CadenceReplay replay;
 #endif
 	bQuit = false;
 	unsigned updateCounter = 0, frameCounter = 0;
@@ -325,8 +330,14 @@ void winmain::MainLoop()
 			}
 		}
 
-		if (!ProcessWindowMessages() || bQuit)
-			break;
+		bool messagesContinue;
+        {
+#ifdef PINBALL_CADENCE_AUDIT
+            CadenceProbe::Scope scope('I');
+#endif
+            messagesContinue = ProcessWindowMessages();
+        }
+        if (!messagesContinue || bQuit) break;
 
 #ifdef PINBALL_CADENCE_AUDIT
 		cadence.Record('S', has_focus && !single_step ? 1 : 0);
@@ -363,10 +374,17 @@ void winmain::MainLoop()
 			}
 			if (!single_step && !no_time_loss)
 			{
-				auto dt = static_cast<float>(frameDuration.count());
+				#ifdef PINBALL_CADENCE_AUDIT
+                if (!replay.Ready(cadence)) { no_time_loss = true; }
+                else {
+                replay.BeforeStep();
+                CadenceProbe::Scope physicsScope('P');
+#endif
+                auto dt = static_cast<float>(frameDuration.count());
 				pb::frame(dt);
 #ifdef PINBALL_CADENCE_AUDIT
 				cadence.Record('U', dt);
+                replay.AfterStep(dt);
 #endif
 				if (DispGRhistory)
 				{
@@ -380,12 +398,18 @@ void winmain::MainLoop()
 					gfrOffset = (gfrOffset + 1) % gfrDisplay.size();
 				}
 				updateCounter++;
+#ifdef PINBALL_CADENCE_AUDIT
+                }
+#endif
 			}
 			no_time_loss = false;
 
 			if (UpdateToFrameCounter >= UpdateToFrameRatio)
 			{
-				if (Options.HideCursor && CursorIdleCounter <= 0)
+				#ifdef PINBALL_CADENCE_AUDIT
+                CadenceProbe::Scope drawScope('D');
+#endif
+                if (Options.HideCursor && CursorIdleCounter <= 0)
 					ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 				ImGui_ImplSDL2_NewFrame();
 				ImGui_Render_NewFrame();
@@ -401,7 +425,13 @@ void winmain::MainLoop()
 				ImGui::Render();
 				ImGui_Render_RenderDrawData(ImGui::GetDrawData());
 
-				SDL_RenderPresent(Renderer);
+				{
+#ifdef PINBALL_CADENCE_AUDIT
+                    CadenceProbe::Scope presentScope('V');
+                    replay.Stall();
+#endif
+                    SDL_RenderPresent(Renderer);
+                }
 #ifdef PINBALL_CADENCE_AUDIT
 				cadence.Record('R', 0);
 #endif
@@ -440,8 +470,11 @@ void winmain::MainLoop()
 			TimePoint frameEnd;
 			if (targetTimeDelta > DurationMs::zero() && !Options.UncappedUpdatesPerSecond)
 			{
-				if (Options.HybridSleep)
-					HybridSleep(targetTimeDelta);
+				#ifdef PINBALL_CADENCE_AUDIT
+                CadenceProbe::Scope sleepScope('W');
+#endif
+                if (Options.HybridSleep)
+                    HybridSleep(targetTimeDelta);
 				else
 					std::this_thread::sleep_for(targetTimeDelta);
 				frameEnd = Clock::now();
@@ -459,6 +492,9 @@ void winmain::MainLoop()
 			UpdateToFrameCounter++;
 
 			CursorIdleCounter = std::max(CursorIdleCounter - static_cast<int>(frameDuration.count()), 0);
+#ifdef PINBALL_CADENCE_AUDIT
+            if (replay.Finished()) { cadence.Finish(); replay.Save(); break; }
+#endif
 		}
 	}
 
