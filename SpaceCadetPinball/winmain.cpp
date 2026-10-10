@@ -11,6 +11,9 @@
 #include "Sound.h"
 #include "translations.h"
 #include "font_selection.h"
+#ifdef PINBALL_CADENCE_AUDIT
+#include "../tools/cadence_probe.h"
+#endif
 
 constexpr const char* winmain::Version;
 
@@ -294,6 +297,9 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 
 void winmain::MainLoop()
 {
+#ifdef PINBALL_CADENCE_AUDIT
+	CadenceProbe cadence;
+#endif
 	bQuit = false;
 	unsigned updateCounter = 0, frameCounter = 0;
 	auto frameStart = Clock::now();
@@ -321,6 +327,10 @@ void winmain::MainLoop()
 
 		if (!ProcessWindowMessages() || bQuit)
 			break;
+
+#ifdef PINBALL_CADENCE_AUDIT
+		cadence.Record('S', has_focus && !single_step ? 1 : 0);
+#endif
 
 		if (has_focus)
 		{
@@ -355,6 +365,9 @@ void winmain::MainLoop()
 			{
 				auto dt = static_cast<float>(frameDuration.count());
 				pb::frame(dt);
+#ifdef PINBALL_CADENCE_AUDIT
+				cadence.Record('U', dt);
+#endif
 				if (DispGRhistory)
 				{
 					auto targetSize = static_cast<unsigned>(static_cast<float>(Options.UpdatesPerSecond) * gfrWindow);
@@ -389,6 +402,9 @@ void winmain::MainLoop()
 				ImGui_Render_RenderDrawData(ImGui::GetDrawData());
 
 				SDL_RenderPresent(Renderer);
+#ifdef PINBALL_CADENCE_AUDIT
+				cadence.Record('R', 0);
+#endif
 				frameCounter++;
 				UpdateToFrameCounter -= UpdateToFrameRatio;
 			}

@@ -177,14 +177,16 @@
     "discrepancy": {
       "corrected": false,
       "unresolved": [
-        "Exact common direction on original",
         "Whether ramp_bmpr_inc_lights is also affected"
       ],
       "feature": "entry lane light rotation",
       "static_evidence": "control.cpp LeftFlipperControl: StepBackward; RightFlipperControl: StepForward; no FullTiltMode branch",
       "target": "fork-full-tilt",
       "fork_observation": "Direction depends on flipper, as in XP",
-      "original_observation": "Same direction regardless of flipper"
+      "original_observation": "Right -> center -> left -> right, regardless of flipper; confirmed by user",
+      "deferred_issue": 33
     }
-  }
+  },
+  "cadence_followup": "2026-10-11-cadence.json",
+  "status_note": "Historical snapshot of the first passage; see cadence_followup for completion and its measurement limits."
 }
