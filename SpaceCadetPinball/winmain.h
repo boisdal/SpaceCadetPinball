@@ -98,7 +98,6 @@ private:
 	static bool ShowImGuiDemo;
 	static bool ShowSpriteViewer;
 	static bool ShowExitPopup;
-	static double UpdateToFrameRatio;
 	static DurationMs TargetFrameTime;
 	static struct optionsStruct& Options;
 	static DurationMs SpinThreshold;

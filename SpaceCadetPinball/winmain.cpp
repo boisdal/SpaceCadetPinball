@@ -11,6 +11,7 @@
 #include "Sound.h"
 #include "translations.h"
 #include "font_selection.h"
+#include "FrameScheduler.h"
 #ifdef PINBALL_CADENCE_AUDIT
 #include "../tools/cadence_probe.h"
 #include "../tools/cadence_replay.h"
@@ -49,7 +50,6 @@ bool winmain::DemoActive = false;
 int winmain::MainMenuHeight = 0;
 std::string winmain::FpsDetails, winmain::PrevSdlError;
 unsigned winmain::PrevSdlErrorCount = 0;
-double winmain::UpdateToFrameRatio;
 winmain::DurationMs winmain::TargetFrameTime;
 optionsStruct& winmain::Options = options::Options;
 winmain::DurationMs winmain::SpinThreshold = DurationMs(0.005);
@@ -164,10 +164,10 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 		ImGuiIO& io = ImGui::GetIO();
 		ImIO = &io;
 		auto iniPath = std::string(prefPath) + "imgui_pb.ini";
-		#ifdef PINBALL_CADENCE_AUDIT
-        if (const char* auditIni = std::getenv("PINBALL_AUDIT_INI")) iniPath = auditIni;
+#ifdef PINBALL_CADENCE_AUDIT
+		if (const char* auditIni = std::getenv("PINBALL_AUDIT_INI")) iniPath = auditIni;
 #endif
-        io.IniFilename = iniPath.c_str();
+		io.IniFilename = iniPath.c_str();
 
 		// First option initialization step: just load settings from .ini. Needs ImGui context.
 		options::InitPrimary();
@@ -303,13 +303,12 @@ void winmain::MainLoop()
 {
 #ifdef PINBALL_CADENCE_AUDIT
 	CadenceProbe cadence;
-    CadenceReplay replay;
+	CadenceReplay replay;
 #endif
 	bQuit = false;
 	unsigned updateCounter = 0, frameCounter = 0;
 	auto frameStart = Clock::now();
-	double UpdateToFrameCounter = 0;
-	DurationMs sleepRemainder(0), frameDuration(TargetFrameTime);
+	FrameScheduler scheduler;
 	auto prevTime = frameStart;
 
 	while (true)
@@ -331,16 +330,31 @@ void winmain::MainLoop()
 		}
 
 		bool messagesContinue;
-        {
+		{
 #ifdef PINBALL_CADENCE_AUDIT
-            CadenceProbe::Scope scope('I');
+			CadenceProbe::Scope scope('I');
 #endif
-            messagesContinue = ProcessWindowMessages();
-        }
-        if (!messagesContinue || bQuit) break;
+			messagesContinue = ProcessWindowMessages();
+		}
+		if (!messagesContinue || bQuit) break;
 
 #ifdef PINBALL_CADENCE_AUDIT
 		cadence.Record('S', has_focus && !single_step ? 1 : 0);
+#endif
+
+		auto sampledTime = Clock::now();
+		auto elapsed = DurationMs(sampledTime - frameStart).count();
+		frameStart = sampledTime;
+		bool advanceGame = has_focus && !single_step && !no_time_loss;
+#ifdef PINBALL_CADENCE_AUDIT
+		advanceGame = advanceGame && replay.Ready(cadence);
+#endif
+		auto dropped = scheduler.Advance(elapsed, advanceGame,
+			Options.UpdatesPerSecond, Options.FramesPerSecond);
+#ifdef PINBALL_CADENCE_AUDIT
+		if (dropped > 0) cadence.Record('L', dropped);
+#else
+		(void)dropped;
 #endif
 
 		if (has_focus)
@@ -372,19 +386,17 @@ void winmain::MainLoop()
 				last_mouse_x = x;
 				last_mouse_y = y;
 			}
-			if (!single_step && !no_time_loss)
+			for (int steps = 0; steps < FrameScheduler::MaxStepsPerPass && scheduler.TakeStep(); ++steps)
 			{
-				#ifdef PINBALL_CADENCE_AUDIT
-                if (!replay.Ready(cadence)) { no_time_loss = true; }
-                else {
-                replay.BeforeStep();
-                CadenceProbe::Scope physicsScope('P');
+#ifdef PINBALL_CADENCE_AUDIT
+				replay.BeforeStep();
+				CadenceProbe::Scope physicsScope('P');
 #endif
-                auto dt = static_cast<float>(frameDuration.count());
+				auto dt = static_cast<float>(scheduler.StepMs());
 				pb::frame(dt);
 #ifdef PINBALL_CADENCE_AUDIT
 				cadence.Record('U', dt);
-                replay.AfterStep(dt);
+				replay.AfterStep(dt);
 #endif
 				if (DispGRhistory)
 				{
@@ -399,17 +411,17 @@ void winmain::MainLoop()
 				}
 				updateCounter++;
 #ifdef PINBALL_CADENCE_AUDIT
-                }
+				if (replay.Finished()) break;
 #endif
 			}
 			no_time_loss = false;
 
-			if (UpdateToFrameCounter >= UpdateToFrameRatio)
+			if (scheduler.TakeFrame())
 			{
-				#ifdef PINBALL_CADENCE_AUDIT
-                CadenceProbe::Scope drawScope('D');
+#ifdef PINBALL_CADENCE_AUDIT
+				CadenceProbe::Scope drawScope('D');
 #endif
-                if (Options.HideCursor && CursorIdleCounter <= 0)
+				if (Options.HideCursor && CursorIdleCounter <= 0)
 					ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 				ImGui_ImplSDL2_NewFrame();
 				ImGui_Render_NewFrame();
@@ -427,16 +439,15 @@ void winmain::MainLoop()
 
 				{
 #ifdef PINBALL_CADENCE_AUDIT
-                    CadenceProbe::Scope presentScope('V');
-                    replay.Stall();
+					CadenceProbe::Scope presentScope('V');
+					replay.Stall();
 #endif
-                    SDL_RenderPresent(Renderer);
-                }
+					SDL_RenderPresent(Renderer);
+				}
 #ifdef PINBALL_CADENCE_AUDIT
 				cadence.Record('R', 0);
 #endif
 				frameCounter++;
-				UpdateToFrameCounter -= UpdateToFrameRatio;
 			}
 
 			auto sdlError = SDL_GetError();
@@ -464,36 +475,19 @@ void winmain::MainLoop()
 				}
 			}
 
-			auto updateEnd = Clock::now();
-			auto targetTimeDelta = TargetFrameTime - DurationMs(updateEnd - frameStart) - sleepRemainder;
-
-			TimePoint frameEnd;
+			// Work already performed consumes the remaining deadline as well.
+			auto targetTimeDelta = DurationMs(scheduler.WaitMs()) - DurationMs(Clock::now() - sampledTime);
 			if (targetTimeDelta > DurationMs::zero() && !Options.UncappedUpdatesPerSecond)
 			{
-				#ifdef PINBALL_CADENCE_AUDIT
-                CadenceProbe::Scope sleepScope('W');
-#endif
-                if (Options.HybridSleep)
-                    HybridSleep(targetTimeDelta);
-				else
-					std::this_thread::sleep_for(targetTimeDelta);
-				frameEnd = Clock::now();
-			}
-			else
-			{
-				frameEnd = updateEnd;
-			}
-
-			// Limit duration to 2 * target time
-			sleepRemainder = Clamp(DurationMs(frameEnd - updateEnd) - targetTimeDelta, -TargetFrameTime,
-			                       TargetFrameTime);
-			frameDuration = std::min<DurationMs>(DurationMs(frameEnd - frameStart), 2 * TargetFrameTime);
-			frameStart = frameEnd;
-			UpdateToFrameCounter++;
-
-			CursorIdleCounter = std::max(CursorIdleCounter - static_cast<int>(frameDuration.count()), 0);
 #ifdef PINBALL_CADENCE_AUDIT
-            if (replay.Finished()) { cadence.Finish(); replay.Save(); break; }
+				CadenceProbe::Scope sleepScope('W');
+#endif
+				if (Options.HybridSleep) HybridSleep(targetTimeDelta);
+				else std::this_thread::sleep_for(targetTimeDelta);
+			}
+			CursorIdleCounter = std::max(CursorIdleCounter - static_cast<int>(elapsed), 0);
+#ifdef PINBALL_CADENCE_AUDIT
+			if (replay.Finished()) { cadence.Finish(); replay.Save(); break; }
 #endif
 		}
 	}
@@ -676,16 +670,13 @@ void winmain::RenderUi()
 				                     ImGuiSliderFlags_AlwaysClamp))
 				{
 					changed = true;
-					Options.FramesPerSecond = std::min(Options.UpdatesPerSecond.V, Options.FramesPerSecond.V);
 				}
 				if (ImGui::SliderInt("FPS", &Options.FramesPerSecond.V, options::MinFps, options::MaxFps, "%d",
 				                     ImGuiSliderFlags_AlwaysClamp))
 				{
 					changed = true;
-					Options.UpdatesPerSecond = std::max(Options.UpdatesPerSecond.V, Options.FramesPerSecond.V);
 				}
-				snprintf(buffer, sizeof buffer - 1, "Uncapped UPS (FPS ratio %02.02f)", UpdateToFrameRatio);
-				if (ImGui::MenuItem(buffer, nullptr, Options.UncappedUpdatesPerSecond))
+				if (ImGui::MenuItem("Disable sleep (benchmark)", nullptr, Options.UncappedUpdatesPerSecond))
 				{
 					Options.UncappedUpdatesPerSecond ^= true;
 				}
@@ -1348,9 +1339,8 @@ void winmain::Restart()
 
 void winmain::UpdateFrameRate()
 {
-	// UPS >= FPS
-	auto fps = Options.FramesPerSecond.V, ups = Options.UpdatesPerSecond.V;
-	UpdateToFrameRatio = static_cast<double>(ups) / fps;
+	// Physics cadence is independent of the presentation rate.
+	auto ups = Options.UpdatesPerSecond.V;
 	TargetFrameTime = DurationMs(1000.0 / ups);
 }
 
