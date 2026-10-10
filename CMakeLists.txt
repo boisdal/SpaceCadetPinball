@@ -50,6 +50,7 @@ set(SOURCE_FILES
         SpaceCadetPinball/EmbeddedData.h
         SpaceCadetPinball/font_selection.cpp
         SpaceCadetPinball/font_selection.h
+        SpaceCadetPinball/FrameScheduler.h
         SpaceCadetPinball/fullscrn.cpp
         SpaceCadetPinball/fullscrn.h
         SpaceCadetPinball/gdrv.cpp

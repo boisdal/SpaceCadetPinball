@@ -2,6 +2,9 @@
 #include "options.h"
 #include "Sound.h"
 #include "maths.h"
+#ifdef PINBALL_CADENCE_AUDIT
+#include "../tools/cadence_probe.h"
+#endif
 
 int Sound::num_channels;
 bool Sound::enabled_flag = false;
@@ -44,7 +47,10 @@ void Sound::Close()
 
 void Sound::PlaySound(Mix_Chunk* wavePtr, int time, TPinballComponent* soundSource, const char* info)
 {
-	if (MixOpen && wavePtr && enabled_flag)
+	#ifdef PINBALL_CADENCE_AUDIT
+    CadenceProbe::Scope audioScope('A');
+#endif
+    if (MixOpen && wavePtr && enabled_flag)
 	{
 		if (Mix_Playing(-1) == num_channels)
 		{

@@ -16,15 +16,39 @@ class CadenceProbe
     bool started = false, done = false;
     int previousState = -1;
 public:
+    static CadenceProbe*& Active() { static CadenceProbe* probe = nullptr; return probe; }
+    struct Scope
+    {
+        char kind;
+        Clock::time_point begin = Clock::now();
+        explicit Scope(char kind) : kind(kind) {}
+        ~Scope() { if (Active()) Active()->Record(kind, std::chrono::duration<double, std::milli>(Clock::now() - begin).count()); }
+    };
+    void Start() { started = true; start = Clock::now(); previousState = -1; }
+    void Finish()
+    {
+        if (done || !started || path.empty()) return;
+        done = true;
+        const auto elapsed = std::chrono::duration<double>(Clock::now() - start).count();
+        auto file = std::fopen(path.c_str(), "w");
+        if (!file) { std::perror("cadence output"); return; }
+        std::fprintf(file, "seconds,event,value\n");
+        for (auto& event : events)
+            std::fprintf(file, "%.9f,%c,%.9f\n", event.seconds, event.kind, event.value);
+        std::fprintf(file, "%.9f,E,1\n", elapsed);
+        std::fclose(file);
+    }
     CadenceProbe()
     {
         const char* value = std::getenv("PINBALL_CADENCE_CSV");
         if (value && *value)
         {
             path = value;
-            events.reserve(40000);
+            events.reserve(180000);
         }
+        Active() = this;
     }
+    ~CadenceProbe() { Active() = nullptr; }
     void Record(char kind, double value)
     {
         if (path.empty() || done) return;
@@ -41,7 +65,7 @@ public:
             previousState = -1;
         }
         double elapsed = std::chrono::duration<double>(now - start).count();
-        if (elapsed >= 45.0 || events.size() >= 40000)
+        if (elapsed >= 45.0 || events.size() >= 180000)
         {
             done = true;
             auto file = std::fopen(path.c_str(), "w");
