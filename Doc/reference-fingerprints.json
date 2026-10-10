@@ -6,14 +6,30 @@
       "description": "Windows XP executable documented by upstream",
       "source": "https://github.com/k4zmu2a/SpaceCadetPinball/blob/cb9b7b886244a27773f66b0b19fdc2998392565e/README.md",
       "evidence": "upstream-documentation",
-      "file": "PINBALL.EXE"
+      "file": "PINBALL.EXE",
+      "sha256": "2bbc8234685fe2f6324040af6ea20123cf00c4a56882ce0d9074f0beefac67bc",
+      "observations": [
+        {
+          "manifest": "reference-manifests/windows-xp-x86-en.json",
+          "path": "pinball.exe",
+          "description": "Windows XP Professional x86 English; SP3 marker; PINBALL.EXE 5.1.2600.5512"
+        }
+      ]
     },
     {
       "sha1": "3f7b5699074b83fd713657cd94671f2156dbedc4",
       "description": "Full Tilt 32-bit executable documented by upstream; patch level unspecified",
       "source": "https://github.com/k4zmu2a/SpaceCadetPinball/blob/cb9b7b886244a27773f66b0b19fdc2998392565e/README.md",
       "evidence": "upstream-documentation",
-      "file": "CADET.EXE"
+      "file": "CADET.EXE",
+      "sha256": "b82e1f15d70f812d008453d3e44c2bde28fc1105056de99e51dea38e05cf3dc4",
+      "observations": [
+        {
+          "manifest": "reference-manifests/full-tilt-win95-en.json",
+          "path": "CADET.EXE",
+          "description": "Full Tilt Windows 95 English; CADET.EXE version strings 1.1"
+        }
+      ]
     },
     {
       "sha1": "2fa0929403e88fb5be0484f18ff7e72f2d8ccca5",
@@ -41,14 +57,35 @@
       "description": "Full Tilt Windows 3.1 executable, reported by issue author",
       "source": "https://github.com/k4zmu2a/SpaceCadetPinball/issues/214",
       "evidence": "community-report",
-      "file": "CADET.EXE"
+      "file": "CADET.EXE",
+      "sha256": "8592ea1c29419949dd807ce8620f83cdabdf540fd61a454e2f00aa86028810f4",
+      "observations": [
+        {
+          "manifest": "reference-manifests/full-tilt-win31-en.json",
+          "path": "CADET.EXE",
+          "description": "Full Tilt Windows 3.1 English; comparison variant, not selected target"
+        }
+      ]
     },
     {
       "sha1": "dd81b3488d6daa14584788bd2a045e08c820597b",
       "description": "Shared by patched Full Tilt and Windows 3.1; cannot identify executable edition",
       "source": "https://github.com/k4zmu2a/SpaceCadetPinball/issues/214",
       "evidence": "community-report-and-local-observation",
-      "file": "CADET.DAT"
+      "file": "CADET.DAT",
+      "sha256": "d4b85b0cc0cb05e4be49bf4a5a56e65be8514c854c0f718180845cb07f272ee3",
+      "observations": [
+        {
+          "manifest": "reference-manifests/full-tilt-win95-en.json",
+          "path": "CADET.DAT",
+          "description": "Full Tilt Windows 95 English; CADET.EXE version strings 1.1"
+        },
+        {
+          "manifest": "reference-manifests/full-tilt-win31-en.json",
+          "path": "CADET.DAT",
+          "description": "Full Tilt Windows 3.1 English; comparison variant, not selected target"
+        }
+      ]
     },
     {
       "sha1": "ab532f6d88c3f377d0d62aa5ce0a334a7bd12740",
@@ -63,6 +100,36 @@
       "source": "https://github.com/boisdal/SpaceCadetPinball/issues/20",
       "evidence": "local-observation",
       "file": "CADET.EXE"
+    },
+    {
+      "sha1": "42f2125c5dffac2560fdf486f2a49bf7e5ce5839",
+      "sha256": "ba89418be9aed5d7f5bc197c00fab4cacf3aff23a1ddc0de134010414acf2d0b",
+      "file": "font.dat",
+      "description": "Windows XP Professional x86 English; SP3 marker; PINBALL.EXE 5.1.2600.5512",
+      "source": "https://github.com/boisdal/SpaceCadetPinball/issues/20",
+      "evidence": "local-media-observation",
+      "observations": [
+        {
+          "manifest": "reference-manifests/windows-xp-x86-en.json",
+          "path": "font.dat",
+          "description": "Windows XP Professional x86 English; SP3 marker; PINBALL.EXE 5.1.2600.5512"
+        }
+      ]
+    },
+    {
+      "sha1": "c1a616edb0985cf8aadfb2a1029dadae16cdfcc5",
+      "sha256": "42defd5d2a339a3953fe643716aff4e35b2cea7a3e54505c82d1e78d5325bc04",
+      "file": "pinball.dat",
+      "description": "Windows XP Professional x86 English; SP3 marker; PINBALL.EXE 5.1.2600.5512",
+      "source": "https://github.com/boisdal/SpaceCadetPinball/issues/20",
+      "evidence": "local-media-observation",
+      "observations": [
+        {
+          "manifest": "reference-manifests/windows-xp-x86-en.json",
+          "path": "pinball.dat",
+          "description": "Windows XP Professional x86 English; SP3 marker; PINBALL.EXE 5.1.2600.5512"
+        }
+      ]
     }
   ]
 }

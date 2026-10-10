@@ -1,0 +1,375 @@
+{
+  "schema_version": 1,
+  "reference_id": "full-tilt-win31-en",
+  "observed_on": "2026-10-10",
+  "description": "Full Tilt Windows 3.1 English; comparison variant, not selected target",
+  "layout": "full-tilt",
+  "source_iso_sha256": "2f3ec1f5bebb5b3fa2ec0b8af170943106f7b4c92a5978e0463166927f0d851b",
+  "source_volume_label": "FULL_TILT",
+  "extraction": "Complete WIN31/FULLTILT/CADET directory copied from ISO",
+  "provenance_limit": "User-provided media; whole ISO authenticity not independently verified. Executable fingerprint compared with documented references. Full Tilt archive claims Win3x.org / MyAbandonware / Redump 114360; claim not independently verified.",
+  "gameplay_validated": false,
+  "files": [
+    {
+      "path": "CADET.BMP",
+      "size": 15484,
+      "sha1": "12c634a386ae147f4f371a2ebcb1010f8f69115e",
+      "sha256": "52770c18ab72b82dd059caf7ddcdbec58008b8564dee1faa0c1f5cd148bcf635"
+    },
+    {
+      "path": "CADET.DAT",
+      "size": 4058141,
+      "sha1": "dd81b3488d6daa14584788bd2a045e08c820597b",
+      "sha256": "d4b85b0cc0cb05e4be49bf4a5a56e65be8514c854c0f718180845cb07f272ee3"
+    },
+    {
+      "path": "CADET.EXE",
+      "size": 642048,
+      "sha1": "ca20c1c91acbddbd79e11cd0425728e4dc27f409",
+      "sha256": "8592ea1c29419949dd807ce8620f83cdabdf540fd61a454e2f00aa86028810f4"
+    },
+    {
+      "path": "SOUND/SOUND1.WAV",
+      "size": 55394,
+      "sha1": "71e1d40a006b405a186eb587d577f57940cf2a6e",
+      "sha256": "d4e2c57a7d0a8e3790066e18f9ba5eb4a8d70e4040b6306581e05549f1888493"
+    },
+    {
+      "path": "SOUND/SOUND104.WAV",
+      "size": 1130,
+      "sha1": "55fb3e2c3483b424af1727c7ec0e6eb43f6edc31",
+      "sha256": "2e818b5036a90bc9cbcf79eda3e7072609f6d19e1ffd60ba8044c6d828d2af15"
+    },
+    {
+      "path": "SOUND/SOUND105.WAV",
+      "size": 1872,
+      "sha1": "ab8384d8b1f3253513736d5289e6cd00630690a6",
+      "sha256": "c1e675dcca67525c40ff1044640e738c434ebc029d51b98a86ae9b0cb884019d"
+    },
+    {
+      "path": "SOUND/SOUND108.WAV",
+      "size": 7658,
+      "sha1": "55ad507c1973a6fb007d3f167850d49c7bf00e8b",
+      "sha256": "1e6edfbc79e394d4eaa9c933f29a9b0f287575dd6ef1c05b90ddd51d59ca2e19"
+    },
+    {
+      "path": "SOUND/SOUND12.WAV",
+      "size": 4200,
+      "sha1": "8b4e5da1b7990ef26bb6a4be87c24a0a3fdddb1a",
+      "sha256": "145d3036df59df255fc8b2f7432bfbac776e59e14e1d8a0a7af9a66a09bd6e69"
+    },
+    {
+      "path": "SOUND/SOUND131.WAV",
+      "size": 1194,
+      "sha1": "42e23f7ee790e2dbc4bf9ec747075114c0609a2c",
+      "sha256": "7407f2cf6ade3872b368c971d09bcc558e2a36c698359e4790d5351260894cf5"
+    },
+    {
+      "path": "SOUND/SOUND14.WAV",
+      "size": 2906,
+      "sha1": "b0dc94477df7c6b7dcc9031da4085f821441722b",
+      "sha256": "ac9a198fd358370b8d761d6af8a723c0e41a69b651ae768a77955a331fb38bf7"
+    },
+    {
+      "path": "SOUND/SOUND16.WAV",
+      "size": 950,
+      "sha1": "dae404ff2b0fbbfa0865ea5dcca8e3025bf03da8",
+      "sha256": "02f8f9b5465c4f2c5035350a2e28af159fcf9e53dd2d7e1a65e509d7aa106835"
+    },
+    {
+      "path": "SOUND/SOUND17.WAV",
+      "size": 1994,
+      "sha1": "24d78f7b22ca489ad8d5e9ec545a04458e4480b9",
+      "sha256": "88924f8c12614fe7a3dade612076ba6f96f8efb2e3352ee99f1a2b8ba05056cb"
+    },
+    {
+      "path": "SOUND/SOUND18.WAV",
+      "size": 3889,
+      "sha1": "3e9c6591582a331cf8ded6cb02b1a7b7e1ba49f8",
+      "sha256": "00cee5f84ccf11d67949bd45fa0852721fe7e2c0189e051a05eddde9a62d3f2d"
+    },
+    {
+      "path": "SOUND/SOUND19.WAV",
+      "size": 5133,
+      "sha1": "a3b022452e309d228631677950e1095ce4a2f55f",
+      "sha256": "09c352d13d67e7f9f1de40f768e1e322aed070c2efbc3a6f45a489970c75a1eb"
+    },
+    {
+      "path": "SOUND/SOUND20.WAV",
+      "size": 8553,
+      "sha1": "fad68a1144aaee146648066009406017bd52b669",
+      "sha256": "1d7f083bd4d3a0f92dd3fdfaeea7221592a5bd7c885835d0759e6a8fbffad3d8"
+    },
+    {
+      "path": "SOUND/SOUND21.WAV",
+      "size": 9098,
+      "sha1": "66d45f5b2f4fadfd9880b800d2b3f7b33d0e32b9",
+      "sha256": "afd142b04f5733e8dc7fc5aa0186ad4a4e59a12d2b7c7f7a5253227f75de86ee"
+    },
+    {
+      "path": "SOUND/SOUND22.WAV",
+      "size": 7279,
+      "sha1": "e22a8af6b2a5e32a057569c858ac8406593dc2f7",
+      "sha256": "4782eefbf7f684559b19383d179b494cea747d7863ca43cc8026de0aac6347a4"
+    },
+    {
+      "path": "SOUND/SOUND24.WAV",
+      "size": 12010,
+      "sha1": "11e1e9661d29bc6bc352703cc4e3cec7f3ece098",
+      "sha256": "a83e1d80ff92ab74bc76656156f0d142c4d921e807da3ae30232902cd42f48f3"
+    },
+    {
+      "path": "SOUND/SOUND25.WAV",
+      "size": 25608,
+      "sha1": "76280ab58ca21fb90847680b090df2eaec8834d5",
+      "sha256": "3082b8a8e9d419c2f7029ef1e321214274f44b48b23a13898930af6ba3450766"
+    },
+    {
+      "path": "SOUND/SOUND26.WAV",
+      "size": 7210,
+      "sha1": "f8c89a6a0a44365db783e820c602bf1b6ffb627a",
+      "sha256": "615ea55bf5de6f5248d56bc06fdc1cf808077c1caceae59d6d0a8830a03bce23"
+    },
+    {
+      "path": "SOUND/SOUND27.WAV",
+      "size": 20146,
+      "sha1": "10e0c41a81576014b6f488055048d5a11703a085",
+      "sha256": "ffa17a311e415b70ecb88362bd1d8f327fa6dac56136ab1bc53e725279744832"
+    },
+    {
+      "path": "SOUND/SOUND28.WAV",
+      "size": 8554,
+      "sha1": "0d55bacbc870c117b255efc560d3820cd4434abb",
+      "sha256": "5c146051fa5d44e68b332ea01780b6778ffa8ba53c278ef3505f4fcae92925c5"
+    },
+    {
+      "path": "SOUND/SOUND29.WAV",
+      "size": 10268,
+      "sha1": "a219738e5e66cb320bca38954cc5cef795f1e4f5",
+      "sha256": "ffc72f7dea5d28a5d7d875aba0ca17cbe49a3ca032414bba5aed56ba755f63a3"
+    },
+    {
+      "path": "SOUND/SOUND3.WAV",
+      "size": 22762,
+      "sha1": "c7e5d4974285667828aed0365f7930cae3b37eb1",
+      "sha256": "6867b61f9370653c64c904452339ab6dede05028f09e6cb3463eb5bcbea764ac"
+    },
+    {
+      "path": "SOUND/SOUND30.WAV",
+      "size": 22474,
+      "sha1": "92d4775abf21c8bb9f3d2c83b9c37563a57f5ee6",
+      "sha256": "efafc8ac5cba1222ab81dc34670d731b4e49b889c6686bcb59f7db811f26639f"
+    },
+    {
+      "path": "SOUND/SOUND34.WAV",
+      "size": 1424,
+      "sha1": "6da9624508ce9b567d645dc39a49a461b5668891",
+      "sha256": "aa0be35e13b9e928e2b138d0af0515ebc3469602f69de6e4d30042e6f983fbd8"
+    },
+    {
+      "path": "SOUND/SOUND35.WAV",
+      "size": 19402,
+      "sha1": "0087b6afab4fdb502f8cb624432cec18017f3f45",
+      "sha256": "f7560309cbe67486460df832bd9a874ff38026b9440c29c22a947bee0d8510ab"
+    },
+    {
+      "path": "SOUND/SOUND36.WAV",
+      "size": 33751,
+      "sha1": "ace9284647eeddfdc529310c45ee9c5ca78108f0",
+      "sha256": "6e4086d704ddeeedd0e05765c555889a10a8b7a63c4bfd4f6288f020092b69e0"
+    },
+    {
+      "path": "SOUND/SOUND38.WAV",
+      "size": 12928,
+      "sha1": "dfd458556c420b02983b021ddc19d2ce64537504",
+      "sha256": "d6ca9e34d45ab9e69e3c27854bbaa41504228820def2d125f7ebccd664d73815"
+    },
+    {
+      "path": "SOUND/SOUND39.WAV",
+      "size": 28185,
+      "sha1": "d044f0141e7caadf69e4f3451e52ab2ab72f3a1a",
+      "sha256": "f761033effcad702adfa9d784d6dec4d6dca7be121f50f294e72b09bcc7a1cdc"
+    },
+    {
+      "path": "SOUND/SOUND4.WAV",
+      "size": 16530,
+      "sha1": "64a7382f7d1b5cc7bdf0b2382f46ff8949f1f3a4",
+      "sha256": "5534a95c432afad371288c7bec622e76e4f5f83cfdfbc0fed2bec7a4e272f1d5"
+    },
+    {
+      "path": "SOUND/SOUND42.WAV",
+      "size": 29140,
+      "sha1": "32751de38985ee954e347f9c21a44bbfe52897b6",
+      "sha256": "7c4b053ed4b725d1ac4cf4e78fcc196a00d759f1cfb9fbb77d321e9e9c208ff9"
+    },
+    {
+      "path": "SOUND/SOUND43.WAV",
+      "size": 22700,
+      "sha1": "f63bd70c855a49a4ed0b59b5b8d6a2793acbd451",
+      "sha256": "516e12107b21ceca6631f247922563b395d15311f9e094593b758ddd3465293d"
+    },
+    {
+      "path": "SOUND/SOUND45.WAV",
+      "size": 9674,
+      "sha1": "7134d022b31c6d78fa6a8e174ad89b5c69ff01e8",
+      "sha256": "6c220a2798e0ea2dd2538d0cd889e3225772359befe928e945c72b0df3f44978"
+    },
+    {
+      "path": "SOUND/SOUND49.WAV",
+      "size": 1780,
+      "sha1": "c1f909114ca8620ef9e0a3796baf83e7b3086153",
+      "sha256": "8cad8f9adfa6e6a7d9fd1029f4b7d14d52e20a301e2965c9568e7bbc5461bfa0"
+    },
+    {
+      "path": "SOUND/SOUND49D.WAV",
+      "size": 3233,
+      "sha1": "4d829fe04eeebddc2fe42b0858d8a8bcad1e2838",
+      "sha256": "b93deec8a8afb2a3e05ea6efdef85960f8d31821c1cbb4db3131fa8a6d0e5ba2"
+    },
+    {
+      "path": "SOUND/SOUND5.WAV",
+      "size": 3084,
+      "sha1": "1de57409c17a74917c70634a2a1fe955959360b3",
+      "sha256": "a3233d69f0b1af5aeb14d4bec509dcd259c177c718cafba389d3eea3cd605b74"
+    },
+    {
+      "path": "SOUND/SOUND50.WAV",
+      "size": 11978,
+      "sha1": "e8dfce349c594dd9df36dccd9b9cb39b627151e1",
+      "sha256": "29d71830e07d5e2f777f5a09fc13875825ca5647135c3f0506788db99e185185"
+    },
+    {
+      "path": "SOUND/SOUND52.WAV",
+      "size": 10666,
+      "sha1": "df33f908964a38a56b86ea245cb1314cd149f631",
+      "sha256": "5e8ca02dd53530978a14aa1f026f8ac62c560737056dbac71f40cb4486653fcc"
+    },
+    {
+      "path": "SOUND/SOUND54.WAV",
+      "size": 18154,
+      "sha1": "bd8744e9be9649697f969495ffd7b102b6f9bca3",
+      "sha256": "7d39903c672d7a9566503c6493c81074b39018c19997d29801fb7fe9096a2d17"
+    },
+    {
+      "path": "SOUND/SOUND55.WAV",
+      "size": 21793,
+      "sha1": "c12a26d7593a0d248fff7f66a74f03ccb92483e0",
+      "sha256": "dfc2db4e4c47460c413a027b1b69ccb1e41b59a9a19f4ce1a742075d76e85ffd"
+    },
+    {
+      "path": "SOUND/SOUND57.WAV",
+      "size": 30405,
+      "sha1": "d646e1e22671793d9cb6b52d253f3b8c7c27e65e",
+      "sha256": "1bfdbe15ce556d6804dd1800bd32fe3d30454dcef0fe6121a455baecf11b84e0"
+    },
+    {
+      "path": "SOUND/SOUND58.WAV",
+      "size": 3408,
+      "sha1": "b7d5945a1150b9a90e8c6236a3608315cc94d249",
+      "sha256": "0bfe131b571e699e3664ca1e81041d6034a99526e1b7a1b6295ced21345c16e3"
+    },
+    {
+      "path": "SOUND/SOUND7.WAV",
+      "size": 26346,
+      "sha1": "9ab922189e01a02b5ae8493069988231640c0acb",
+      "sha256": "5317f788ec12c97fa45f5f437c840b46d2bf7675d14fdae7ad24bc97503c7763"
+    },
+    {
+      "path": "SOUND/SOUND8.WAV",
+      "size": 2005,
+      "sha1": "5d0a9e54cd0815e90d64eb9dc761bb9ba1ff92e5",
+      "sha256": "d9a5084484566533899b59749dfb39e49c13c2dc13fc6ea2e92e0d09db674bac"
+    },
+    {
+      "path": "SOUND/SOUND9.WAV",
+      "size": 20002,
+      "sha1": "8e4519a86b041ff73221613dca30d8c53d4ecad1",
+      "sha256": "10a10c4440dd5a788f88077ccdbe0883443c12cf415104fa8e3633f1543f6168"
+    },
+    {
+      "path": "SOUND/TABA1.MID",
+      "size": 12323,
+      "sha1": "356d033d1358e20c5c99cb74c2026696480697b4",
+      "sha256": "02c5814ae0dd5a25e0445b2aaabd3bf1d9480557cd6f909c8ca04e0f02706390"
+    },
+    {
+      "path": "SOUND/TABA2.MID",
+      "size": 16023,
+      "sha1": "db218ecf322ca9fbe389fb51dd54a26898462053",
+      "sha256": "4723b292f096fae150fc849a8fa57c829a96a93cbf6988108b5adc9f335be8b7"
+    },
+    {
+      "path": "SOUND/TABA3.MID",
+      "size": 16023,
+      "sha1": "db218ecf322ca9fbe389fb51dd54a26898462053",
+      "sha256": "4723b292f096fae150fc849a8fa57c829a96a93cbf6988108b5adc9f335be8b7"
+    },
+    {
+      "path": "WAVEMIX.DLL",
+      "size": 26112,
+      "sha1": "369d6d87a9be9940e9f1c6b41faf97b587c93631",
+      "sha256": "1acc125114da8fe550d54d3058ca722884514ed818a3310c074500d3dac0d305"
+    }
+  ],
+  "declared_sound_names": [
+    "sound/...",
+    "sound/sound1.wav",
+    "sound/sound104.wav",
+    "sound/sound105.wav",
+    "sound/sound108.wav",
+    "sound/sound111.wav",
+    "sound/sound12.wav",
+    "sound/sound131.wav",
+    "sound/sound14.wav",
+    "sound/sound16.wav",
+    "sound/sound17.wav",
+    "sound/sound18.wav",
+    "sound/sound19.wav",
+    "sound/sound2.wav",
+    "sound/sound20.wav",
+    "sound/sound21.wav",
+    "sound/sound22.wav",
+    "sound/sound24.wav",
+    "sound/sound25.wav",
+    "sound/sound26.wav",
+    "sound/sound27.wav",
+    "sound/sound28.wav",
+    "sound/sound29.wav",
+    "sound/sound3.wav",
+    "sound/sound30.wav",
+    "sound/sound34.wav",
+    "sound/sound35.wav",
+    "sound/sound36.wav",
+    "sound/sound37.wav",
+    "sound/sound38.wav",
+    "sound/sound39.wav",
+    "sound/sound4.wav",
+    "sound/sound43.wav",
+    "sound/sound44.wav",
+    "sound/sound45.wav",
+    "sound/sound49.wav",
+    "sound/sound49D.wav",
+    "sound/sound5.wav",
+    "sound/sound50.wav",
+    "sound/sound52.wav",
+    "sound/sound54.wav",
+    "sound/sound55.wav",
+    "sound/sound57.wav",
+    "sound/sound59.wav",
+    "sound/sound62.wav",
+    "sound/sound7.wav",
+    "sound/sound8.wav",
+    "sound/sound9.wav"
+  ],
+  "absent_declared_sounds_on_reference": [
+    "sound/...",
+    "sound/sound111.wav",
+    "sound/sound2.wav",
+    "sound/sound37.wav",
+    "sound/sound44.wav",
+    "sound/sound59.wav",
+    "sound/sound62.wav"
+  ],
+  "missing_music": [],
+  "audio_limit": "Declared DAT names are not a trace of sounds requested during gameplay. Absences listed here are observed on the complete extracted reference, not automatically optional on other datasets."
+}
