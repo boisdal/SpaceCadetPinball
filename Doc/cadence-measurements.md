@@ -12,6 +12,14 @@ Une seule application de jeu tourne à la fois, fenêtrée au premier plan, sans
 entrée utilisateur pendant la capture. Pas de compilation pendant les mesures.
 Même Windows 11 x64 build 26300 et mêmes ressources identifiées dans les manifestes.
 
+Le build mesuré provient de `work/21-comparative-scenarios`, commit `9f526f3` :
+il conserve le travail local préexistant #29 sur les records. La livraison
+`work/21-delivery` reprend uniquement #21 et ses documents de référence #20 ;
+elle n'intègre pas #29. La boucle mesurée et la sonde sont identiques sur les
+deux branches. Pour retrouver l'ensemble exact des sources du build mesuré,
+utiliser `9f526f3` ; les chiffres ne sont pas présentés comme un nouveau relevé
+d'un binaire compilé depuis la branche de livraison.
+
 ## Ce qui est mesuré
 
 **Fork :** un build d'audit optionnel horodate, avec `std::chrono::steady_clock`,

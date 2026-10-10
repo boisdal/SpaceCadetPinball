@@ -281,5 +281,13 @@
     "Fork present counts are SDL calls, not monitor scanouts; instrumentation overhead not independently measured.",
     "One 45 s active capture per fork mode; different unsynchronized trajectories and window sizes, not a performance ranking.",
     "Fork Windows had a 118.26 ms presentation interval; cause not attributed. Cadence/physics coupling belongs to #25."
-  ]
+  ],
+  "delivery_validation": {
+    "branch": "work/21-delivery",
+    "includes": "#20 reference documents and #21 only; #29 excluded",
+    "audit_build_sha256": "03ffdeb0444110d39f1eb6daee60cd5cb69dbafce9a7af84ab79a19e07adb22b",
+    "build_exit_code": 0,
+    "interactively_measured": false,
+    "note": "Recorded measurements use the historical working baseline 9f526f3. MainLoop and probe are identical in delivery; this build is a compilation check only."
+  }
 }
