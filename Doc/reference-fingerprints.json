@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "fingerprints": [
+    {
+      "sha1": "2a5b525e0f631bb6107639e2a69df15986fb0d05",
+      "description": "Windows XP executable documented by upstream",
+      "source": "https://github.com/k4zmu2a/SpaceCadetPinball/blob/cb9b7b886244a27773f66b0b19fdc2998392565e/README.md",
+      "evidence": "upstream-documentation",
+      "file": "PINBALL.EXE"
+    },
+    {
+      "sha1": "3f7b5699074b83fd713657cd94671f2156dbedc4",
+      "description": "Full Tilt 32-bit executable documented by upstream; patch level unspecified",
+      "source": "https://github.com/k4zmu2a/SpaceCadetPinball/blob/cb9b7b886244a27773f66b0b19fdc2998392565e/README.md",
+      "evidence": "upstream-documentation",
+      "file": "CADET.EXE"
+    },
+    {
+      "sha1": "2fa0929403e88fb5be0484f18ff7e72f2d8ccca5",
+      "description": "Full Tilt before patch, reported by issue author",
+      "source": "https://github.com/k4zmu2a/SpaceCadetPinball/issues/214",
+      "evidence": "community-report",
+      "file": "CADET.EXE"
+    },
+    {
+      "sha1": "7a1a072a9e97a73dba29671dae1ad04967747310",
+      "description": "Full Tilt before patch, reported by issue author",
+      "source": "https://github.com/k4zmu2a/SpaceCadetPinball/issues/214",
+      "evidence": "community-report",
+      "file": "CADET.DAT"
+    },
+    {
+      "sha1": "33a12d33d19b7b891c4fccd765fde782305a9ec9",
+      "description": "Full Tilt after Maxis patch, reported by issue author",
+      "source": "https://github.com/k4zmu2a/SpaceCadetPinball/issues/214",
+      "evidence": "community-report",
+      "file": "CADET.EXE"
+    },
+    {
+      "sha1": "ca20c1c91acbddbd79e11cd0425728e4dc27f409",
+      "description": "Full Tilt Windows 3.1 executable, reported by issue author",
+      "source": "https://github.com/k4zmu2a/SpaceCadetPinball/issues/214",
+      "evidence": "community-report",
+      "file": "CADET.EXE"
+    },
+    {
+      "sha1": "dd81b3488d6daa14584788bd2a045e08c820597b",
+      "description": "Shared by patched Full Tilt and Windows 3.1; cannot identify executable edition",
+      "source": "https://github.com/k4zmu2a/SpaceCadetPinball/issues/214",
+      "evidence": "community-report-and-local-observation",
+      "file": "CADET.DAT"
+    },
+    {
+      "sha1": "ab532f6d88c3f377d0d62aa5ce0a334a7bd12740",
+      "description": "Locally inspected UPX repack; authenticity unverified",
+      "source": "https://github.com/boisdal/SpaceCadetPinball/issues/20",
+      "evidence": "local-observation",
+      "file": "CADET.EXE"
+    },
+    {
+      "sha1": "cff7a1f01a039f24260cd9e9384924ab10b19878",
+      "description": "Local repack after UPX decompression; version strings 1.1, numeric fields 1.0.0.0; authenticity unverified",
+      "source": "https://github.com/boisdal/SpaceCadetPinball/issues/20",
+      "evidence": "local-observation",
+      "file": "CADET.EXE"
+    }
+  ]
+}
