@@ -1,0 +1,293 @@
+{
+  "schema_version": 1,
+  "recorded_on": "2026-10-11",
+  "timezone": "Europe/Paris",
+  "issue": 21,
+  "status": "completed_with_documented_measurement_limits",
+  "procedure": "../cadence-measurements.md",
+  "environment": {
+    "os": "Windows 11 Pro x64",
+    "version": "10.0.26300",
+    "virtual_machine": false,
+    "windows": "windowed, one game process at a time during captures",
+    "sounds_enabled": true,
+    "music_enabled": false,
+    "workloads_comparable_as_benchmark": false
+  },
+  "build": {
+    "source_parent_commit": "b27d429b9240a9dd896e2d4af97fce5c0b36812f",
+    "source_note": "Existing #20/#29 working baseline plus opt-in cadence probe in this delivery; high-score code is not part of #21.",
+    "compiler": "Zig 0.13.0 c++ -std=c++11 -O2 -DNDEBUG -DUNICODE -D_UNICODE -DPINBALL_CADENCE_AUDIT",
+    "sdl": "2.30.11",
+    "sdl_mixer": "2.8.0",
+    "renderer": "direct3d",
+    "configured_fps": 60,
+    "configured_ups": 120,
+    "hybrid_sleep": false,
+    "uncapped_ups": false,
+    "executable_sha256": "15bfd89ae163f5e8f66d24b5b86f0e8e7b4300621e0ae9426d2393dac32e4ae0",
+    "instrumented_workspace_files_sha256": {
+      "SpaceCadetPinball/winmain.cpp": "841f4de728cfe0a81aa39f9a68c510a6c77549ebff7a22da659ef057dc63e796",
+      "tools/cadence_probe.h": "3818542b5fa31eb09aeb2cf3870d9a30f71877a65ec57f455b211cca34ec7c5b",
+      "tools/build_comparison_windows.ps1": "c534ffaeb218c6b919276e412844cc202b31d7b25d4b53984dd8ee13191241f0"
+    },
+    "normal_build_verified_sha256": "0514b941754becaa98fabb0ed2f2aff80e8ba81f29f902782eca09fa4f682395"
+  },
+  "originals": [
+    {
+      "target": "original-windows",
+      "version": "5.1.2600.5512",
+      "manifest": "../reference-manifests/windows-xp-x86-en.json",
+      "executable_sha256": "2bbc8234685fe2f6324040af6ea20123cf00c4a56882ce0d9074f0beefac67bc"
+    },
+    {
+      "target": "original-full-tilt",
+      "version": "1.1 WIN95",
+      "manifest": "../reference-manifests/full-tilt-win95-en.json",
+      "executable_sha256": "b82e1f15d70f812d008453d3e44c2bde28fc1105056de99e51dea38e05cf3dc4"
+    }
+  ],
+  "runs": [
+    {
+      "target": "original-windows",
+      "scenario": "Demo",
+      "raw_data": "cadence-2026-10-11/xp-cadence-2026-10-11.json.gz",
+      "raw_sha256": "e8f41f9b02d1e9c4f9a0f6611cb3a3ea49185b924b3ea222c4aa63123c93466f",
+      "archive_sha256": "54f3d397a9c11e93c34397e29b6e42834a4f0ac0a3e2afe48e2c85df5230069e",
+      "results": {
+        "method": "native title; repeated polls, not independent batches",
+        "duration_s": 45,
+        "discarded_warmup_s": 10,
+        "polls": 449,
+        "diagnostic_rate": {
+          "min": 77.74,
+          "mean": 79.89590200445434,
+          "p50": 79.28,
+          "p95": 82.87,
+          "p99": 82.87,
+          "max": 82.87
+        },
+        "title_value_changes": 12
+      }
+    },
+    {
+      "target": "original-full-tilt",
+      "scenario": "Demo",
+      "raw_data": "cadence-2026-10-11/ft-cadence-2026-10-11.json.gz",
+      "raw_sha256": "2f3a5211931a1dc61b973ff14dce630ec7e0f9ede189a01a195d29b530fb675a",
+      "archive_sha256": "8c885ac60b78bbc620bb5467b5c9a4a0f665115c3016aa55c061f34cc1888611",
+      "results": {
+        "method": "native title; repeated polls, not independent batches",
+        "duration_s": 45,
+        "discarded_warmup_s": 10,
+        "polls": 449,
+        "diagnostic_rate": {
+          "min": 23076.92,
+          "mean": 37051.927884187084,
+          "p50": 37500.0,
+          "p95": 42857.14,
+          "p99": 50000.0,
+          "max": 50000.0
+        },
+        "title_value_changes": 338
+      }
+    },
+    {
+      "target": "fork-windows",
+      "scenario": "New Game / Launch Ball / no further input",
+      "score_observed_after_capture": 44500,
+      "raw_data": "cadence-2026-10-11/fork-xp-active-cadence-2026-10-11.csv.gz",
+      "raw_sha256": "898eed23b227687621a611ce83dae8e1fcee2d4f8ef177d8ddb427064af7d0a9",
+      "archive_sha256": "9ff52363adb43a0a140536f8de85bc3712f61fdec5def1650beab3edcfa3690d",
+      "results": {
+        "method": "instrumented fork",
+        "duration_s": 45,
+        "capture_end_s": 45.0076695,
+        "states": [
+          {
+            "seconds": "0.000000000",
+            "event": "S",
+            "value": "1.000000000"
+          }
+        ],
+        "updates": {
+          "count": 5370,
+          "per_second": 119.33333333333333,
+          "interval_ms": {
+            "min": 0.0017000000003264404,
+            "mean": 8.381355503818215,
+            "p50": 8.479599999999365,
+            "p95": 9.148299999999665,
+            "p99": 9.521500000001737,
+            "max": 118.19039999999958
+          }
+        },
+        "presents": {
+          "count": 2685,
+          "per_second": 59.666666666666664,
+          "interval_ms": {
+            "min": 0.2542999999999296,
+            "mean": 16.76309362891207,
+            "p50": 16.80799999999749,
+            "p95": 17.317699999999547,
+            "p99": 17.577100000000456,
+            "max": 118.2603000000011
+          }
+        },
+        "simulation_dt_ms": {
+          "min": 0.016100001,
+          "mean": 8.333891580702234,
+          "p50": 8.499300003,
+          "p95": 9.128299713,
+          "p99": 9.508000374,
+          "max": 16.666666031
+        },
+        "simulation_seconds": 44.752997788371005
+      }
+    },
+    {
+      "target": "fork-full-tilt",
+      "scenario": "New Game / Launch Ball / no further input",
+      "score_observed_after_capture": 27750,
+      "raw_data": "cadence-2026-10-11/fork-ft-active-cadence-2026-10-11.csv.gz",
+      "raw_sha256": "53fee1c8d0762abdc7d8931419e510c851c929c559a65188d2f696cd2699ffba",
+      "archive_sha256": "dcbacd800e93b0cdd499a1f843bd71518f74f323f57ea3572fd99cfa9fc4fdb9",
+      "results": {
+        "method": "instrumented fork",
+        "duration_s": 45,
+        "capture_end_s": 45.0007899,
+        "states": [
+          {
+            "seconds": "0.000000000",
+            "event": "S",
+            "value": "1.000000000"
+          }
+        ],
+        "updates": {
+          "count": 5400,
+          "per_second": 120.0,
+          "interval_ms": {
+            "min": 6.4648999999992185,
+            "mean": 8.333425115762179,
+            "p50": 8.478399999997777,
+            "p95": 9.381300000001147,
+            "p99": 9.535400000000749,
+            "max": 10.239300000000284
+          }
+        },
+        "presents": {
+          "count": 2700,
+          "per_second": 60.0,
+          "interval_ms": {
+            "min": 14.832600000000085,
+            "mean": 16.66677891811782,
+            "p50": 16.717500000000385,
+            "p95": 17.393200000000775,
+            "p99": 17.636400000000663,
+            "max": 18.188099999999707
+          }
+        },
+        "simulation_dt_ms": {
+          "min": 6.490799904,
+          "mean": 8.333445164978889,
+          "p50": 8.49960041,
+          "p95": 9.366700172,
+          "p99": 9.512700081,
+          "max": 10.019000053
+        },
+        "simulation_seconds": 45.000603890886
+      }
+    },
+    {
+      "target": "fork-windows-supplementary",
+      "scenario": "Demo, remained Awaiting Deployment, not evidence of active ball",
+      "score_observed_after_capture": 0,
+      "raw_data": "cadence-2026-10-11/fork-xp-cadence-2026-10-11.csv.gz",
+      "raw_sha256": "55610ec77bda60befa07c95f64548436853432192dc084f4232c937aa9bc2d97",
+      "archive_sha256": "ccec817fc3a06d924e4045b962257df9b83c0d05929c104b6b204121c05dd980",
+      "results": {
+        "method": "instrumented fork",
+        "duration_s": 45,
+        "capture_end_s": 45.0002504,
+        "states": [
+          {
+            "seconds": "0.000000000",
+            "event": "S",
+            "value": "1.000000000"
+          }
+        ],
+        "updates": {
+          "count": 5400,
+          "per_second": 120.0,
+          "interval_ms": {
+            "min": 6.432999999994138,
+            "mean": 8.333335099092425,
+            "p50": 8.480299999999996,
+            "p95": 9.151699999999984,
+            "p99": 9.593500000001143,
+            "max": 10.16570000000172
+          }
+        },
+        "presents": {
+          "count": 2700,
+          "per_second": 60.0,
+          "interval_ms": {
+            "min": 14.995499999999495,
+            "mean": 16.666773471656168,
+            "p50": 16.80989999999838,
+            "p95": 17.482200000003445,
+            "p99": 17.76830000000018,
+            "max": 18.487399999997933
+          }
+        },
+        "simulation_dt_ms": {
+          "min": 6.467100143,
+          "mean": 8.333374368003518,
+          "p50": 8.500699997,
+          "p95": 9.137800217,
+          "p99": 9.519800186,
+          "max": 10.153699875
+        },
+        "simulation_seconds": 45.000221587219
+      }
+    }
+  ],
+  "local_screenshots": [
+    {
+      "file": "fork-ft-active-cadence-end.jpg",
+      "sha256": "48f92fbf7d30190a28b3c32031a00b56d7f81690fc1421bdb855bcab64e240f9"
+    },
+    {
+      "file": "fork-xp-active-cadence-end.jpg",
+      "sha256": "91711c7a8ac6f76f66cfeeb13d6b1a1cfe0b97bcc2a52ac66ee26907ec42c904"
+    },
+    {
+      "file": "fork-xp-cadence-end.jpg",
+      "sha256": "0cef99703cf19ffe757485d6eb30c94752b1bad5e921c57ded94234988b45f31"
+    },
+    {
+      "file": "ft-cadence-end.jpg",
+      "sha256": "eed6f7daea808d7d3722e676b88397551d0feb083d19c0b3da66853721f11276"
+    },
+    {
+      "file": "xp-cadence-end.jpg",
+      "sha256": "f7e22f0729c075175b661f7f9273ab2cd0611b31dc1b907cd753c16d06bf3f78"
+    }
+  ],
+  "limitations": [
+    "Native title is a poll-weighted diagnostic, not exact event counts or displayed FPS.",
+    "Full Tilt native loop counts zero-dt calls: positive-dt simulation rate and GDI display rate remain unmeasured.",
+    "Native title sampling can miss values between 100 ms polls; repeated values are not independent batches.",
+    "Fork present counts are SDL calls, not monitor scanouts; instrumentation overhead not independently measured.",
+    "One 45 s active capture per fork mode; different unsynchronized trajectories and window sizes, not a performance ranking.",
+    "Fork Windows had a 118.26 ms presentation interval; cause not attributed. Cadence/physics coupling belongs to #25."
+  ],
+  "delivery_validation": {
+    "branch": "work/21-delivery",
+    "includes": "#20 reference documents and #21 only; #29 excluded",
+    "audit_build_sha256": "03ffdeb0444110d39f1eb6daee60cd5cb69dbafce9a7af84ab79a19e07adb22b",
+    "build_exit_code": 0,
+    "interactively_measured": false,
+    "note": "Recorded measurements use the historical working baseline 9f526f3. MainLoop and probe are identical in delivery; this build is a compilation check only."
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "recorded_on": "2026-10-10",
+  "timezone": "Europe/Paris",
+  "issue": 21,
+  "status": "partial",
+  "method": "interactive_observation",
+  "procedure": "../comparison-scenarios.md",
+  "environment": {
+    "os": "Windows 11 Pro x64",
+    "version": "10.0.26300",
+    "virtual_machine": false,
+    "players": 1,
+    "sounds_enabled": true,
+    "music_enabled": false,
+    "fullscreen": false
+  },
+  "build": {
+    "source_commit": "3fa164920f67ec5b38c33be378c2597a8f0139f5",
+    "reported_game_version": "2.1.1 DEV",
+    "compiler": "Zig 0.13.0 c++",
+    "sdl": "2.30.11",
+    "sdl_mixer": "2.8.0",
+    "flags": [
+      "-std=c++11",
+      "-O2",
+      "-DNDEBUG",
+      "-DUNICODE",
+      "-D_UNICODE"
+    ],
+    "renderer": "direct3d",
+    "tested_executable_sha256": "41563f66c34476f9b27679f0972cf890540360acb01f53c165483f69da20f5a0",
+    "script_rebuild_sha256": "07172eef80199a3dafdf732b32d5d73f82131b2ad044b7583c2a492c68d7a7f3",
+    "script_rebuild_exit_code": 0,
+    "rebuild_note": "Same gameplay sources, different output path; script rebuild was compiled, not interactively replayed.",
+    "windows_resource_compiled": false,
+    "configured_fps": 60,
+    "configured_ups": 120,
+    "uncapped_ups": false,
+    "measured_fps": null,
+    "measured_ups": null
+  },
+  "runs": [
+    {
+      "target": "original-windows",
+      "reference_manifest": "../reference-manifests/windows-xp-x86-en.json",
+      "executable_sha1": "2a5b525e0f631bb6107639e2a69df15986fb0d05",
+      "version": "5.1.2600.5512",
+      "launch": "observed",
+      "score_samples": [
+        3500,
+        13500
+      ],
+      "score_reset": 0,
+      "ball_after_new_game": 1,
+      "flipper_cycle": "not_validated",
+      "controls": {
+        "left": "V",
+        "right": "B",
+        "plunger": "Space"
+      },
+      "measured_fps": null,
+      "measured_ups": null,
+      "evidence": [
+        "original-xp-score-0.png",
+        "original-xp-new-game-0.png"
+      ],
+      "notes": "Actual process used an installed Microsoft Games copy: 67 of 69 manifest SHA256 entries match, including executable, DAT and gameplay resources; pinball.chm and pinball.hlp differ or are absent. Diagnostic cheat-key attempt took place after score observations; no readable frame counter obtained."
+    },
+    {
+      "target": "fork-windows",
+      "reference_manifest": "../reference-manifests/windows-xp-x86-en.json",
+      "loaded_dat": "PINBALL.DAT",
+      "launch": "observed",
+      "score_samples": [
+        2000
+      ],
+      "score_reset": 0,
+      "ball_after_new_game": 1,
+      "flipper_cycle": "not_validated",
+      "controls": {
+        "left": "Z",
+        "right": "/",
+        "plunger": "Space"
+      },
+      "measured_fps": null,
+      "measured_ups": null,
+      "evidence": [
+        "fork-windows-score-0.png",
+        "fork-windows-new-game-0.png"
+      ],
+      "notes": "Re-Deploy observed. New Game invoked through menu. Music disabled; stderr reports missing timidity.cfg."
+    },
+    {
+      "target": "original-full-tilt",
+      "reference_manifest": "../reference-manifests/full-tilt-win95-en.json",
+      "executable_sha1": "3f7b5699074b83fd713657cd94671f2156dbedc4",
+      "version": "1.1",
+      "launch": "observed",
+      "score_samples": [
+        5250,
+        15250
+      ],
+      "score_reset": 0,
+      "ball_after_new_game": 1,
+      "flipper_cycle": "not_validated",
+      "controls": {
+        "left": "Tab",
+        "right": "PageDown",
+        "plunger": "Ctrl"
+      },
+      "resolution_setting": "maximum (1024 x 768)",
+      "measured_fps": null,
+      "measured_ups": null,
+      "evidence": [
+        "original-ft-left-tap-0.png"
+      ],
+      "evidence_note": "Saved capture shows a separate repeat launch with 6750 points after a left-key tap; initial score/reset observations are in the session transcript only.",
+      "notes": "Window initially clipped; repositioned. Resolution change not validated. Unable to find other tables dialog dismissed after repeat app launch."
+    },
+    {
+      "target": "fork-full-tilt",
+      "reference_manifest": "../reference-manifests/full-tilt-win95-en.json",
+      "loaded_dat": "CADET.DAT",
+      "launch": "observed",
+      "score_samples": [
+        39250
+      ],
+      "ball_at_score_sample": 2,
+      "score_reset": 0,
+      "ball_after_new_game": 1,
+      "flipper_cycle": "not_validated",
+      "controls": {
+        "left": "Z",
+        "right": "/",
+        "plunger": "Space"
+      },
+      "measured_fps": null,
+      "measured_ups": null,
+      "evidence": [
+        "fork-ft-score-0.png",
+        "fork-ft-new-game-0.png"
+      ],
+      "notes": "Music disabled; stderr reports missing timidity.cfg."
+    }
+  ],
+  "local_evidence_sha256": {
+    "original-xp-score-0.png": "fa7baafcbbeb9f4b07632ff0aa926475632fcefc1de721775ab27b9391007386",
+    "original-xp-new-game-0.png": "1fa65e29e31937434c123b4e4e6581946f4bf815a4b2424ecc323903d05bf384",
+    "fork-windows-score-0.png": "2b3f2256e9c7acdeaa2c99511c1a7ebcfae3a974677a475a37c064f5eb29ebe1",
+    "fork-windows-new-game-0.png": "fd0bd6645fca1b6eb9ae3b8ad9af9949aaec8b0eabb4ad3a59c6efd1a3d8d14b",
+    "original-ft-left-tap-0.png": "d83f368f0ecfdb8dc2a184178bdf4497a8db889e2d06d9135743d48431d14b22",
+    "fork-ft-score-0.png": "7f6f95bb05995631e82a5549b4112d9ec63eacbc0475610ef6896f82a2749a26",
+    "fork-ft-new-game-0.png": "5d62945be938b1c005c29a7e8730331f0dbf0fdf331e05a87690e7f693e0377b"
+  },
+  "limitations": [
+    "Scores sampled at different times; no deterministic trajectories or target-specific scoring comparison.",
+    "Effective frame/update rates not measured; configured FPS/UPS are not observations of runtime frequency.",
+    "Brief injected taps do not establish a full held flipper cycle or contact latency.",
+    "Graphics captures and proprietary game data remain local and are not included in Git."
+  ],
+  "user_followup": {
+    "source": "User report in the issue #21 validation conversation",
+    "flippers": {
+      "measured_fps": null,
+      "measured_ups": null,
+      "measured_latency_ms": null,
+      "statement": "Les flippers marchent parfaitement dans tous les cas. Pas de retard, pas de mouvement saccadé.",
+      "result": "validated_by_user",
+      "targets": [
+        "original-windows",
+        "fork-windows",
+        "original-full-tilt",
+        "fork-full-tilt"
+      ]
+    },
+    "discrepancy": {
+      "corrected": false,
+      "unresolved": [
+        "Whether ramp_bmpr_inc_lights is also affected"
+      ],
+      "feature": "entry lane light rotation",
+      "static_evidence": "control.cpp LeftFlipperControl: StepBackward; RightFlipperControl: StepForward; no FullTiltMode branch",
+      "target": "fork-full-tilt",
+      "fork_observation": "Direction depends on flipper, as in XP",
+      "original_observation": "Right -> center -> left -> right, regardless of flipper; confirmed by user",
+      "deferred_issue": 33
+    }
+  },
+  "cadence_followup": "2026-10-11-cadence.json",
+  "status_note": "Historical snapshot of the first passage; see cadence_followup for completion and its measurement limits."
+}
