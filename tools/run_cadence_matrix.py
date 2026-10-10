@@ -12,7 +12,7 @@ def main():
     parser.add_argument('--data', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--case', action='append', required=True,
-                        help='name:fps:width:height:stall_ms[:noaudio|resize]')
+                        help='name:fps:width:height:stall_ms[:noaudio|resize|hidpi]')
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     for case in args.case:
@@ -25,6 +25,7 @@ def main():
                    PINBALL_AUDIT_STALL_MS=stall, PINBALL_AUDIT_INI=str(base)+'.ini',
                    PINBALL_AUDIT_RESIZE='1' if 'resize' in extra else '0',
                    PINBALL_CADENCE_CSV=str(base)+'.csv')
+        env['SDL_WINDOWS_DPI_SCALING'] = '1' if 'hidpi' in extra else '0'
         command = [str(args.exe.resolve())] + (['-noaudio'] if extra == ['noaudio'] else [])
         with open(str(base)+'.stdout', 'w') as out, open(str(base)+'.stderr', 'w') as err:
             subprocess.run(command, cwd=args.data.resolve(), env=env, stdout=out, stderr=err,

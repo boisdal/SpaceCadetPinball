@@ -29,7 +29,16 @@ public:
         options::Options.UncappedUpdatesPerSecond = false;
         winmain::UpdateFrameRate();
         SDL_SetWindowSize(winmain::MainWindow, Env("PINBALL_AUDIT_WIDTH", 800), Env("PINBALL_AUDIT_HEIGHT", 600));
+        int windowW, windowH, outputW, outputH;
+        SDL_GetWindowSize(winmain::MainWindow, &windowW, &windowH);
+        SDL_GetRendererOutputSize(winmain::Renderer, &outputW, &outputH);
+        float dpi = 0;
+        SDL_GetDisplayDPI(SDL_GetWindowDisplayIndex(winmain::MainWindow), &dpi, nullptr, nullptr);
+        std::printf("Audit: window=%dx%d output=%dx%d display_dpi=%.2f FPS=%d UPS=120\n",
+            windowW, windowH, outputW, outputH, dpi, options::Options.FramesPerSecond.V);
         std::srand(1);
+        // A second New Game skips the startup light show, just like the menu.
+        pb::replay_level(false);
     }
     bool Ready(CadenceProbe& probe)
     {
@@ -49,7 +58,15 @@ public:
         // The initial feed timer takes ~960 ms: wait until the ball is present.
         while (nextInput < 29 && simulated + 0.0001 >= 2000 + nextInput * 500)
         {
-            if (nextInput == 0) pb::launch_ball();
+            if (nextInput == 0)
+            {
+                if (!pb::MainTable->BallList.front()->ActiveFlag)
+                {
+                    std::fprintf(stderr, "Audit launch rejected: no active ball\n");
+                    std::exit(3);
+                }
+                pb::launch_ball();
+            }
             else
             {
                 auto phase = (nextInput - 1) % 4;
