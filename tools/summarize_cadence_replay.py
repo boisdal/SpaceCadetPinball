@@ -34,6 +34,16 @@ def summarize(path, trajectory):
     dt = [float(r['value']) for r in rows if r['event'] == 'U']
     result['simulation_ms'] = sum(dt)
     result['dt_ms'] = distribution(dt)
+    simulated = 0.0
+    lag = {}
+    for row in rows:
+        if row['event'] == 'U':
+            simulated += float(row['value'])
+            for mark in (8000, 10000, 12000, 17000):
+                if simulated >= mark and str(mark) not in lag:
+                    lag[str(mark)] = float(row['seconds']) * 1000 - simulated
+    result['wall_minus_sim_ms_at_sim_ms'] = lag
+    result['lag_change_8_to_12_s_ms'] = lag['12000'] - lag['8000']
     result['lost_ms'] = sum(float(r['value']) for r in rows if r['event'] == 'L')
     result['inputs'] = [int(float(r['value'])) for r in rows if r['event'] == 'K']
     if result['inputs'] != list(range(25)):

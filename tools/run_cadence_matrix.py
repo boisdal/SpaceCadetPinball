@@ -18,8 +18,13 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     for case in args.case:
         name, fps, width, height, stall, *extra = case.split(':')
+        if not (60 <= int(fps) <= 360 and 320 <= int(width) <= 3840
+                and 240 <= int(height) <= 2160 and 0 <= int(stall) <= 5000):
+            raise ValueError(f'Invalid replay configuration: {case}')
+        if len(extra) > 1 or any(item not in ('noaudio', 'resize', 'hidpi') for item in extra):
+            raise ValueError(f'Unknown replay option: {extra}')
         base = (args.output / name).resolve()
-        if base.with_suffix('.csv').exists():
+        if any(Path(str(base)+suffix).exists() for suffix in ('.csv', '.ini', '.stdout', '.stderr')):
             raise FileExistsError(base)
         env = dict(os.environ, PINBALL_AUDIT_REPLAY='1', PINBALL_AUDIT_FPS=fps,
                    PINBALL_AUDIT_WIDTH=width, PINBALL_AUDIT_HEIGHT=height,

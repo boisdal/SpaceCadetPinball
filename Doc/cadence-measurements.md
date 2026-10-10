@@ -1,5 +1,10 @@
 # Relevé de cadence du 11 octobre 2026
 
+Ce relevé décrit la boucle **avant #25**. Le diagnostic complémentaire, la
+correction et les replays après correction figurent dans
+[Cadence indépendante de l'affichage](simulation-cadence.md). Les chiffres
+historiques ci-dessous restent inchangés.
+
 Complément du [corpus comparatif #21](comparison-scenarios.md). Le scénario C1
 utilise `Game > Demo` sur les originaux. Pour le fork, utiliser `Game > New Game`,
 puis `Game > Launch Ball`, sans autre entrée pendant le relevé. Les éventuelles
