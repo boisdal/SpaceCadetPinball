@@ -3,8 +3,8 @@
 Procédure et premier corpus de la [story #21](https://github.com/boisdal/SpaceCadetPinball/issues/21),
 après l'[identification des références](reference-inventory.md).
 Ce corpus teste le démarrage, le lancement et le score. Il ne démontre pas
-l'équivalence physique des jeux. La cadence effective et la course des flippers
-restent à mesurer avant la validation complète de la story.
+l'équivalence physique des jeux. La course des flippers est validée par le retour
+manuel de l'utilisateur ; la cadence effective reste à mesurer.
 
 ## Compiler sous Windows x64
 
@@ -141,7 +141,7 @@ Dans le fork, `pb::launch_ball` demande `PlungerLaunchBall`, qui applique
 `MaxPullback` dans `TPlunger.cpp`. Ce choix évite de dépendre d'une durée de
 maintien d'Espace injectée par l'outil. Il ne mesure pas la charge progressive.
 
-### F1 — Course des flippers (validation restante)
+### F1 — Course des flippers (validée manuellement)
 
 Avant lancement, vérifier les touches dans les contrôles du jeu. Maintenir le
 flipper gauche environ une seconde, relâcher, puis faire de même à droite.
@@ -150,9 +150,15 @@ rester nul. Refaire après lancement pour vérifier le contact avec une bille.
 Relever séparément animation, contact et latence, sans conclure de l'un à l'autre.
 
 Les taps automatisés de cette session n'ont pas fourni de capture montrant toute
-la course. Le résultat F1 est **non validé**, même si les entrées ont été envoyées.
+la course. Ce premier passage automatisé ne validait donc pas F1.
 L'API utilisée fournit un appui bref, sans paramètre de maintien : ne pas présenter
 ces taps comme le protocole d'une seconde ci-dessus.
+
+Après le protocole manuel fourni dans la conversation, l'utilisateur confirme :
+« Les flippers marchent parfaitement dans tous les cas. Pas de retard, pas de
+mouvement saccadé. » F1 est donc validé par observation humaine pour les quatre
+configurations. L'absence de retard perceptible n'est pas une mesure de latence
+en millisecondes ni de cadence FPS/UPS.
 
 ## Résultats du premier passage
 
@@ -162,10 +168,10 @@ synchronisées et aucune graine aléatoire commune n'a été imposée.
 
 | Cible | Score positif lu | Nouvelle partie : score 0 / bille 1 | Lancement L1 | F1 |
 | --- | ---: | --- | --- | --- |
-| Original XP | 3 500 puis 13 500 | observé | observé | non validé |
-| Fork Windows | 2 000, avec `Re-Deploy` | observé par menu | observé | non validé |
-| Original Full Tilt | 5 250 puis 15 250 | observé après F2 | observé | non validé |
-| Fork Full Tilt | 39 250, bille 2 | observé par menu | observé | non validé |
+| Original XP | 3 500 puis 13 500 | observé | observé | validé par l'utilisateur |
+| Fork Windows | 2 000, avec `Re-Deploy` | observé par menu | observé | validé par l'utilisateur |
+| Original Full Tilt | 5 250 puis 15 250 | observé après F2 | observé | validé par l'utilisateur |
+| Fork Full Tilt | 39 250, bille 2 | observé par menu | observé | validé par l'utilisateur |
 
 Un second lancement Full Tilt original a aussi produit 6 750 points lors d'une
 capture après un tap gauche ; ce relevé est séparé du passage sans commandes.
@@ -185,9 +191,31 @@ bruts. Seuls la méthode, les résultats textuels et les empreintes sont version
 - **Automatisé :** compilation, calcul des empreintes, contrôles de structure du
   corpus. Pas de mesure automatisée de physique ou de cadence dans ce passage.
 
-Pour terminer #21, compléter F1 avec un appui maintenu et relever la cadence
+Pour terminer #21, relever la cadence
 effective, avec outil, durée d'échantillonnage, pauses et méthode explicités.
 Une vidéo peut vérifier l'animation ; des FPS vidéo seuls ne mesurent pas les UPS
 du moteur. Le scénario de score et L1 sont réalisés pour les quatre cibles.
 La matrice détaillée des écarts de règles relève de #22 ; ne pas déduire un défaut
 confirmé des seuls scores finaux différents de ce corpus.
+
+## Écart signalé pendant la validation manuelle : entry lanes Full Tilt
+
+L'utilisateur observe que l'original Full Tilt permute les lumières des entry
+lanes dans le même sens, quel que soit le flipper. Le fork Full Tilt permute dans
+des sens opposés selon le flipper, comme XP. C'est un écart rapporté par comparaison
+interactive de l'utilisateur, corroboré côté fork par l'analyse statique :
+`control::LeftFlipperControl` envoie `TLightGroupStepBackward`, tandis que
+`RightFlipperControl` envoie `TLightGroupStepForward`, sans branche `FullTiltMode`.
+Les deux fonctions commandent `bmpr_inc_lights` et `ramp_bmpr_inc_lights`.
+
+Pour rejouer : obtenir une configuration asymétrique des lumières (par exemple
+une seule allumée), puis comparer une pression gauche et une pression droite
+depuis le même état, sans passage de bille entre les deux. Noter l'ordre spatial
+des lumières avant/après sur l'original et le fork. Une configuration uniforme
+ne permet pas de voir le sens de rotation.
+
+Le sens unique exact de l'original et le comportement de l'autre groupe de
+lumières ne sont pas établis par ce retour. Ne pas déduire de la présence des
+deux groupes dans le code que les deux sont concernés. Écart à reprendre dans
+la matrice #22, puis dans une correction de fidélité ; aucune correction de
+règles n'est incluse dans le corpus #21.
