@@ -2,7 +2,6 @@
 import argparse
 import csv
 import gzip
-import hashlib
 import json
 from pathlib import Path
 from summarize_cadence import distribution
@@ -37,7 +36,7 @@ def summarize(path, trajectory):
     result['dt_ms'] = distribution(dt)
     result['lost_ms'] = sum(float(r['value']) for r in rows if r['event'] == 'L')
     result['inputs'] = [int(float(r['value'])) for r in rows if r['event'] == 'K']
-    if result['inputs'] != list(range(29)):
+    if result['inputs'] != list(range(25)):
         raise ValueError('Missing replay input')
     result['phases_ms'] = {kind: distribution([float(r['value']) for r in rows if r['event'] == kind])
                            for kind in 'IAPDVWJ' if any(r['event'] == kind for r in rows)}

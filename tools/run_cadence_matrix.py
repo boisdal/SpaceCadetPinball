@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+from summarize_cadence_replay import summarize
 
 
 def main():
@@ -32,7 +33,8 @@ def main():
                            timeout=65, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
         if not Path(str(base)+'.csv.trajectory.csv').exists():
             raise RuntimeError(f'{name}: replay did not finish')
-        print(json.dumps({'case': case, 'output': str(base)}), flush=True)
+        summary = summarize(Path(str(base)+'.csv'), Path(str(base)+'.csv.trajectory.csv'))
+        print(json.dumps({'case': case, 'output': str(base), 'score': summary['final_score']}), flush=True)
 
 
 if __name__ == '__main__':

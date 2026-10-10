@@ -55,8 +55,8 @@ public:
     {
         if (!Enabled) return;
         // Launch, then alternate and simultaneous flippers. Repeat every 2 s.
-        // The initial feed timer takes ~960 ms: wait until the ball is present.
-        while (nextInput < 29 && simulated + 0.0001 >= 2000 + nextInput * 500)
+        // Allow the feed timer and the ball's bounces on the plunger to settle.
+        while (nextInput < 25 && simulated + 0.0001 >= 4000 + nextInput * 500)
         {
             if (nextInput == 0)
             {
