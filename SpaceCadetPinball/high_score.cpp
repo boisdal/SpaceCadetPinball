@@ -12,71 +12,42 @@ high_score_entry high_score::DlgData;
 std::vector<high_score_entry> high_score::ScoreQueue;
 high_score_struct high_score::highscore_table[5];
 
+namespace
+{
+	std::string ActiveScoreProfile;
+	high_score_struct LegacyScores[5];
+	bool HasLegacyScores = false;
+	bool ShowLegacyScores = false;
+}
+
 int high_score::read()
 {
-	char Buffer[20];
-
-	int checkSum = 0;
-	clear_table();
-	for (auto position = 0; position < 5; ++position)
+	if (!ActiveScoreProfile.empty())
+		write();
+	ActiveScoreProfile = high_score_storage::profile(pb::FullTiltMode, pb::FullTiltDemoMode);
+	auto get = [](const std::string& key, const std::string& fallback) -> std::string
 	{
-		auto& tablePtr = highscore_table[position];
-
-		snprintf(Buffer, sizeof Buffer, "%d", position);
-		strcat(Buffer, ".Name");
-		auto name = options::GetSetting(Buffer, "");
-		strncpy(tablePtr.Name, name.c_str(), sizeof tablePtr.Name);
-
-		snprintf(Buffer, sizeof Buffer, "%d", position);
-		strcat(Buffer, ".Score");
-		tablePtr.Score = options::get_int(Buffer, tablePtr.Score);
-
-		for (int i = static_cast<int>(strlen(tablePtr.Name)); --i >= 0; checkSum += tablePtr.Name[i])
-		{
-		}
-		checkSum += tablePtr.Score;
-	}
-
-	auto verification = options::get_int("Verification", 7);
-	if (checkSum != verification)
-		clear_table();
+		return options::GetSetting(key, fallback);
+	};
+	high_score_storage::read(highscore_table, ActiveScoreProfile, get);
+	HasLegacyScores = high_score_storage::read(LegacyScores, "", get);
+	ShowLegacyScores = false;
+	ScoreQueue.clear();
+	dlg_enter_name = false;
+	ShowDialog = false;
 	return 0;
 }
 
 int high_score::write()
 {
-	char Buffer[20];
-
-	int checkSum = 0;
-	for (auto position = 0; position < 5; ++position)
-	{
-		auto& tablePtr = highscore_table[position];
-
-		snprintf(Buffer, sizeof Buffer, "%d", position);
-		strcat(Buffer, ".Name");
-		options::SetSetting(Buffer, tablePtr.Name);
-
-		snprintf(Buffer, sizeof Buffer, "%d", position);
-		strcat(Buffer, ".Score");
-		options::set_int(Buffer, tablePtr.Score);
-
-		for (int i = static_cast<int>(strlen(tablePtr.Name)); --i >= 0; checkSum += tablePtr.Name[i])
-		{
-		}
-		checkSum += tablePtr.Score;
-	}
-
-	options::set_int("Verification", checkSum);
+	high_score_storage::write(highscore_table, ActiveScoreProfile,
+		[](const std::string& key, const std::string& value) { options::SetSetting(key, value); });
 	return 0;
 }
 
 void high_score::clear_table()
 {
-	for (auto& table : highscore_table)
-	{
-		table.Score = -999;
-		table.Name[0] = 0;
-	}
+	high_score_storage::clear(highscore_table);
 }
 
 int high_score::get_score_position(int score)
@@ -108,11 +79,13 @@ void high_score::place_new_score_into(high_score_entry data)
 
 void high_score::show_high_score_dialog()
 {
+	ShowLegacyScores = false;
 	ShowDialog = true;
 }
 
 void high_score::show_and_set_high_score_dialog(high_score_entry score)
 {
+	ShowLegacyScores = false;
 	ScoreQueue.insert(ScoreQueue.begin(), score);
 	ShowDialog = true;
 }
@@ -148,6 +121,11 @@ void high_score::RenderHighScoreDialog()
 	bool unused_open = true, textBoxSubmit = false;
 	if (ImGui::BeginPopupModal(pb::get_rc_string(Msg::HIGHSCORES_Caption), &unused_open, ImGuiWindowFlags_AlwaysAutoResize))
 	{
+		ImGui::TextUnformatted(ActiveScoreProfile == "windows" ? "Windows" :
+			ActiveScoreProfile == "full-tilt-demo" ? "Full Tilt! (Demo)" : "Full Tilt!");
+		if (HasLegacyScores && !dlg_enter_name)
+			ImGui::Checkbox(pb::get_rc_string(Msg::HIGHSCORES_Legacy), &ShowLegacyScores);
+		const auto displayedTable = ShowLegacyScores ? LegacyScores : highscore_table;
 		if (ImGui::BeginTable("table1", 3, ImGuiTableFlags_Borders))
 		{
 			char buf[36];
@@ -163,7 +141,7 @@ void high_score::RenderHighScoreDialog()
 				snprintf(buf, sizeof buf, "%d", row + 1);
 				ImGui::TextUnformatted(buf);
 
-				auto currentRow = &highscore_table[row + offset];
+				auto currentRow = &displayedTable[row + offset];
 				auto score = currentRow->Score;
 				ImGui::TableNextColumn();
 				if (dlg_enter_name && DlgData.Position == row)
@@ -199,6 +177,7 @@ void high_score::RenderHighScoreDialog()
 			if (dlg_enter_name)
 			{
 				place_new_score_into(DlgData);
+				write();
 			}
 			ImGui::CloseCurrentPopup();
 		}
@@ -208,7 +187,7 @@ void high_score::RenderHighScoreDialog()
 			ImGui::CloseCurrentPopup();
 
 		ImGui::SameLine();
-		if (ImGui::Button(pb::get_rc_string(Msg::HIGHSCORES_Clear)))
+		if (!ShowLegacyScores && ImGui::Button(pb::get_rc_string(Msg::HIGHSCORES_Clear)))
 			ImGui::OpenPopup("Confirm");
 		if (ImGui::BeginPopupModal("Confirm", nullptr, ImGuiWindowFlags_MenuBar))
 		{
@@ -216,6 +195,7 @@ void high_score::RenderHighScoreDialog()
 			if (ImGui::Button(pb::get_rc_string(Msg::GenericOk), ImVec2(120, 0)))
 			{
 				clear_table();
+				write();
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SetItemDefaultFocus();
