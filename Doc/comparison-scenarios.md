@@ -4,7 +4,9 @@ Procédure et premier corpus de la [story #21](https://github.com/boisdal/SpaceC
 après l'[identification des références](reference-inventory.md).
 Ce corpus teste le démarrage, le lancement et le score. Il ne démontre pas
 l'équivalence physique des jeux. La course des flippers est validée par le retour
-manuel de l'utilisateur ; la cadence effective reste à mesurer.
+manuel de l'utilisateur. Le [relevé de cadence du 11 octobre](cadence-measurements.md)
+complète ce premier passage, avec la distinction entre cadence de boucle,
+présentations SDL et limites du diagnostic natif Full Tilt.
 
 ## Compiler sous Windows x64
 
@@ -191,8 +193,8 @@ bruts. Seuls la méthode, les résultats textuels et les empreintes sont version
 - **Automatisé :** compilation, calcul des empreintes, contrôles de structure du
   corpus. Pas de mesure automatisée de physique ou de cadence dans ce passage.
 
-Pour terminer #21, relever la cadence
-effective, avec outil, durée d'échantillonnage, pauses et méthode explicités.
+La cadence a été relevée dans un [passage complémentaire](cadence-measurements.md),
+avec outil, durée d'échantillonnage, pauses et méthode explicités.
 Une vidéo peut vérifier l'animation ; des FPS vidéo seuls ne mesurent pas les UPS
 du moteur. Le scénario de score et L1 sont réalisés pour les quatre cibles.
 La matrice détaillée des écarts de règles relève de #22 ; ne pas déduire un défaut
@@ -214,8 +216,8 @@ depuis le même état, sans passage de bille entre les deux. Noter l'ordre spati
 des lumières avant/après sur l'original et le fork. Une configuration uniforme
 ne permet pas de voir le sens de rotation.
 
-Le sens unique exact de l'original et le comportement de l'autre groupe de
-lumières ne sont pas établis par ce retour. Ne pas déduire de la présence des
-deux groupes dans le code que les deux sont concernés. Écart à reprendre dans
-la matrice #22, puis dans une correction de fidélité ; aucune correction de
-règles n'est incluse dans le corpus #21.
+Le sens confirmé ensuite par l'utilisateur est **droite → centre → gauche →
+droite**, avec l'un ou l'autre flipper. Le comportement de l'autre groupe de
+lumières n'est pas établi : ne pas déduire de sa présence dans le code qu'il est
+concerné. Correction mineure différée dans [#33](https://github.com/boisdal/SpaceCadetPinball/issues/33),
+sans bloquer #21. Aucune correction de règles n'est incluse dans ce corpus.

@@ -4,7 +4,8 @@ param(
     [Parameter(Mandatory)][string]$Zig,
     [Parameter(Mandatory)][string]$Sdl,
     [Parameter(Mandatory)][string]$Mixer,
-    [Parameter(Mandatory)][string]$OutputDirectory
+    [Parameter(Mandatory)][string]$OutputDirectory,
+    [switch]$CadenceAudit
 )
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
@@ -25,7 +26,9 @@ $exe = Join-Path $output 'SpaceCadetPinball.exe'
 # Gameplay sources are the same translation units used by CMake.
 $sources = Get-ChildItem -LiteralPath "$repo/SpaceCadetPinball" -Filter '*.cpp' |
     Sort-Object Name | ForEach-Object FullName
-& $compiler c++ -std=c++11 -O2 -DNDEBUG -DUNICODE -D_UNICODE `
+$auditFlags = @()
+if ($CadenceAudit) { $auditFlags += '-DPINBALL_CADENCE_AUDIT' }
+& $compiler c++ -std=c++11 -O2 -DNDEBUG -DUNICODE -D_UNICODE @auditFlags `
     -I "$sdlRoot/include" -I "$mixerRoot/include" @sources `
     "$sdlRoot/lib/x64/SDL2.lib" "$mixerRoot/lib/x64/SDL2_mixer.lib" `
     -lwinmm -o $exe
