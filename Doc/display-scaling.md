@@ -47,8 +47,35 @@ Validation performed locally:
 - This change does not modify simulation scheduling, collision geometry or game
   rules. The #25 deterministic cadence results remain separate evidence.
 
-Still to observe in the integrated executable: both modes in window/fullscreen,
-resize and DPI changes; dimensions/fullscreen/filters after restart; import and
-mode dialogs in the small Windows window. The user's comfort and readability
-assessment on their 4K screen is explicitly still pending. Mathematical 4K
-layout checks are not a claim of human validation or a real 4K screenshot.
+Interactive checks on 2026-10-17 used isolated audit preferences and the two
+registered reference directories. No normal player settings or OS DPI settings
+were changed.
+
+- The final font build reported effective DPI 144 and a 20px font at UI Scale 1.
+  Full Tilt was observed in desktop fullscreen and returned to its 1280 x 916
+  renderer/window size through the Full Screen menu command.
+- Changing UI Scale from 1 to 1.5 in the open Graphics menu rebuilt the font to
+  29px between frames. The labels enlarged immediately and remained readable.
+  The import dialog stayed within the window with wrapped paths and accessible
+  Inspect/Cancel buttons. The mode-change dialog also fitted with both actions
+  visible; switching to Windows retained the window size and UI scale.
+- Windows was observed in both windowed and desktop-fullscreen modes. Closing
+  through Game > Exit saved FullScreen=1, UI Scale=1.500000, Window Width=1280,
+  Window Height=916 and Selected historical mode=windows to the isolated INI.
+- Restarting the statically linked, instrumented single executable from #31
+  (`audit/issue31/final-audit/SpaceCadetPinball.exe`, production base 04c998d)
+  restored Windows in fullscreen and the enlarged UI. Returning to windowed
+  mode restored the same size. Its Game Data menu showed both registered modes
+  and Windows selected. It then closed normally; no test game process remained.
+  This is an interactive smoke test on the development machine, not a clean
+  Windows installation test. The instrumented build enables fixture isolation.
+- Both builds used the SDL Direct3D renderer. The diagnostic confirmed equal
+  window and renderer pixel dimensions. Sky screenshots report logical sizes
+  (e.g. 855 x 642 including the frame for a 1280 x 916 client at 144 DPI), so
+  their dimensions must not be mistaken for physical renderer resolution.
+
+The test did not change OS DPI or move between monitors of different DPI. That
+transition remains to observe. Automated geometry checks cover 4K dimensions;
+interactive captures establish display operation, not the user's subjective
+comfort. User comfort and readability on their 4K screen remain pending. No
+new deterministic physics/cadence claim is made from these UI checks.
