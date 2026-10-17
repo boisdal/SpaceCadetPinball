@@ -1,6 +1,7 @@
 # Collisions et multibille Full Tilt — #27
 
-Relevé du 17 octobre 2026, source `3d5b0b0`. Aucun changement de physique
+Relevé du 17 octobre 2026, source `3d5b0b0`, puis extension d'intégration décrite
+ci-dessous. Aucun changement de physique
 n'est justifié par les vérifications ci-dessous. La story reste ouverte : les
 tests de composants ne remplacent pas la comparaison des trajectoires avec
 CADET.EXE, ni l'appréciation des sensations par l'utilisateur.
@@ -72,7 +73,7 @@ Les sons, lampes et messages sont des doubles observables ; les remplacements
 et décréments sont injectés. Ce test ne prouve donc pas le bon déclenchement
 réel de `TDrain::Collision`, des timers ou des éjections.
 
-## Couverture et travail restant
+## Couverture avant l'extension d'intégration
 
 | Domaine | Preuve disponible | Comparaison restante |
 | --- | --- | --- |
@@ -93,3 +94,62 @@ historique doit être mesurée séparément avec ses incertitudes de temps : ne 
 lui attribuer la cadence fixe 120 Hz du fork. L'utilisateur pourra ensuite
 valider les sensations sur une version identifiée. Son retour antérieur sur
 la fluidité des flippers n'est pas une validation globale de cette story.
+
+## Extension : vrai moteur, composants et timers chargés
+
+Deux exécutions supplémentaires de 18 s ont chargé le DAT FT authentifié, avec
+le vrai `winmain`, les vrais constructeurs, la boucle physique et les timers,
+sous SDL `dummy` / rendu logiciel. Il n'y a ni fenêtre visible, ni doublure des
+composants ou du moteur, ni lecture audio. Les deux traces comportent chacune
+2160 pas à 120 Hz et 3599 états de billes ; leurs octets sont identiques.
+Les [résultats et traces](comparison-runs/multiball-issue27-2026-10-17/summary.json)
+enregistrent l'identité du DAT et de l'exécutable d'audit.
+
+Le scénario injecte des collisions à l'entrée des vrais composants ; il ne
+prétend pas que ces collisions ont été atteintes par une trajectoire naturelle.
+Il prépare l'éligibilité au lock (`lite4`), appelle `TSink::Collision`, puis
+laisse le contrôleur et les vrais timers créer et éjecter les billes. Il n'écrit
+pas directement les compteurs de locks ou de multibille.
+
+| Temps simulé constaté | Vérification réussie |
+| --- | --- |
+| 4,008 puis 7,008 s | Captures réelles, locks 1 puis 2 ; chaque remplacement a été alimenté par le timer du lanceur avant la capture suivante |
+| 10,008 s | Troisième capture, zéro bille active et trois réservées pour les éjections, locks remis à zéro |
+| 12,108 s | Trois billes réellement actives, vitesses finies non nulles après les trois timers sink ; nudge droit appliqué aux trois vitesses (+1 ; +0,5) |
+| 12,208 puis 12,308 s | Vraies collisions drain : deux puis une bille active, sans consommer la réserve de trois |
+| 12,408 s | Dernier drain : aucune bille active, réserve passée à deux |
+| 15,383 s | Le timer de drain puis celui du lanceur ont réalimenté une bille ; timer d'annulation du nudge effectué |
+| 16,008 / 16,058 / 16,208 s | Vrai kickout : capture, maintien avant échéance, puis éjection par son timer de 100 ms |
+| 16,408 puis 17,508 s | Vrai trou : capture, passage par timer et gravité, libération et changement de masque de collision |
+
+Le test du kickout sélectionne temporairement la branche tilt de capture pour
+avoir une échéance courte explicite ; il ne valide pas les récompenses ni les
+temporisations ordinaires de tous les kickouts. Le test du trou place d'abord la
+bille deux unités au-dessus de la hauteur de sortie. La vérification à 17,508 s
+est une borne après libération, pas la durée exacte de sa chute. Les éventuels
+sons et images n'ont pas été validés par ce rendu sans fenêtre.
+
+Une première tentative du harnais vérifiait le remplacement final trop tôt :
+le délai du DAT du drain doit précéder les 0,96 s du lanceur. L'attente est
+désormais calculée depuis `Drain->TimerTime`, avec une marge d'échantillonnage.
+Il ne s'agissait pas d'une anomalie du jeu. Aucun correctif gameplay n'a été
+nécessaire pour faire réussir cette campagne.
+
+Reproduction depuis une compilation `-CadenceAudit` :
+
+```powershell
+python tools/run_multiball_audit.py --exe <audit>/SpaceCadetPinball.exe --data <référence-WIN95>/CADET --output <nouveau-dossier> --runs 2
+```
+
+Le script impose SDL dummy, désactive l'audio, isole les préférences, exige la
+fin des 13 étapes et compare les traces. Les contrôles C++ utilisent une sortie
+d'erreur explicite, donc restent actifs dans la compilation `-DNDEBUG`. Le
+scénario est inclus uniquement par le chemin de compilation d'audit existant.
+
+Cette extension couvre donc désormais le fonctionnement intégré des locks,
+trois éjections, drains, retour à une bille, impulsion nudge, capture kickout et
+trou. Elle ne lève pas les réserves sur la fidélité historique des trajectoires,
+la collision bille-bille dans la boucle complète, les rampes, les flippers et
+les sensations. Les attentes de compteurs/locks sont corroborées par le binaire
+FT cité plus haut ; les détails numériques de nudge et la branche courte de
+kickout restent ici des vérifications du fork, pas des comparaisons historiques.

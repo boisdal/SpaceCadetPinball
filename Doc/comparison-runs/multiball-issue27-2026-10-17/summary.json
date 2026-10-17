@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "mode": "full-tilt",
+  "simulation_hz": 120,
+  "duration_seconds": 18,
+  "seed": 1,
+  "sdl_video": "dummy",
+  "audio": false,
+  "exe_sha256": "95096bae788aeb277355912696a6d478ef8792717e0dc87e723f720944edb401",
+  "dat_sha256": "d4b85b0cc0cb05e4be49bf4a5a56e65be8514c854c0f718180845cb07f272ee3",
+  "runs": [
+    {
+      "run": 1,
+      "simulation_steps": 2160,
+      "ball_rows": 3599,
+      "trace_sha256": "f7544b0e4b95e2648c8ddca23f304ef78ec5ba4ae92788f4b14a612982619e46",
+      "events": [
+        "Multiball event 0 at 4008.333 ms: active=0 reserved=0 locks=1 reserve=3",
+        "Multiball event 1 at 7008.333 ms: active=0 reserved=0 locks=2 reserve=3",
+        "Multiball event 2 at 10008.333 ms: active=0 reserved=3 locks=0 reserve=3",
+        "Multiball event 3 at 12108.333 ms: active=3 reserved=3 locks=0 reserve=3",
+        "Multiball event 4 at 12208.333 ms: active=2 reserved=2 locks=0 reserve=3",
+        "Multiball event 5 at 12308.333 ms: active=1 reserved=1 locks=0 reserve=3",
+        "Multiball event 6 at 12408.333 ms: active=0 reserved=0 locks=0 reserve=2",
+        "PASS: loaded FT table, real sink locks/replacement timers/three ejections/nudge/drains/feed",
+        "Multiball event 7 at 15383.333 ms: active=1 reserved=1 locks=0 reserve=2",
+        "Multiball event 8 at 16008.333 ms: active=1 reserved=1 locks=0 reserve=2",
+        "Multiball event 9 at 16058.333 ms: active=1 reserved=1 locks=0 reserve=2",
+        "Multiball event 10 at 16208.333 ms: active=1 reserved=1 locks=0 reserve=2",
+        "Multiball event 11 at 16408.333 ms: active=1 reserved=1 locks=0 reserve=2",
+        "PASS: loaded kickout delayed capture/ejection and hole timer/gravity/layer release",
+        "Multiball event 12 at 17508.333 ms: active=1 reserved=1 locks=0 reserve=2"
+      ],
+      "trace": "ft-1.csv.multiball.csv.gz"
+    },
+    {
+      "run": 2,
+      "simulation_steps": 2160,
+      "ball_rows": 3599,
+      "trace_sha256": "f7544b0e4b95e2648c8ddca23f304ef78ec5ba4ae92788f4b14a612982619e46",
+      "events": [
+        "Multiball event 0 at 4008.333 ms: active=0 reserved=0 locks=1 reserve=3",
+        "Multiball event 1 at 7008.333 ms: active=0 reserved=0 locks=2 reserve=3",
+        "Multiball event 2 at 10008.333 ms: active=0 reserved=3 locks=0 reserve=3",
+        "Multiball event 3 at 12108.333 ms: active=3 reserved=3 locks=0 reserve=3",
+        "Multiball event 4 at 12208.333 ms: active=2 reserved=2 locks=0 reserve=3",
+        "Multiball event 5 at 12308.333 ms: active=1 reserved=1 locks=0 reserve=3",
+        "Multiball event 6 at 12408.333 ms: active=0 reserved=0 locks=0 reserve=2",
+        "PASS: loaded FT table, real sink locks/replacement timers/three ejections/nudge/drains/feed",
+        "Multiball event 7 at 15383.333 ms: active=1 reserved=1 locks=0 reserve=2",
+        "Multiball event 8 at 16008.333 ms: active=1 reserved=1 locks=0 reserve=2",
+        "Multiball event 9 at 16058.333 ms: active=1 reserved=1 locks=0 reserve=2",
+        "Multiball event 10 at 16208.333 ms: active=1 reserved=1 locks=0 reserve=2",
+        "Multiball event 11 at 16408.333 ms: active=1 reserved=1 locks=0 reserve=2",
+        "PASS: loaded kickout delayed capture/ejection and hole timer/gravity/layer release",
+        "Multiball event 12 at 17508.333 ms: active=1 reserved=1 locks=0 reserve=2"
+      ],
+      "trace": "ft-2.csv.multiball.csv.gz"
+    }
+  ],
+  "limitations": [
+    "Fork integration only; no execution of the historical reference.",
+    "Sink/drain/kickout/hole collisions are injected at component entry points.",
+    "Lock eligibility and kickout tilt path are controlled fixture state.",
+    "Does not prove natural collision reachability, historical trajectories, audio or visual behavior."
+  ]
+}
