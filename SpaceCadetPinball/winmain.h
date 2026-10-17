@@ -77,7 +77,7 @@ public:
 	static int MainMenuHeight;
 
 	static int WinMain(LPCSTR lpCmdLine);
-	static void UpdateUiScale();
+	static void UpdateUiScale(bool rendererReady = true);
 	static void ConstrainNextDialog(float width, float height);
 	static void SetWindowSize(int width, int height);
 	static int event_handler(const SDL_Event* event);

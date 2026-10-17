@@ -1,3 +1,8 @@
+#ifdef _WIN32
+#define NOMINMAX
+#include <windows.h>
+#include <SDL_syswm.h>
+#endif
 #include "pch.h"
 #include "winmain.h"
 
@@ -57,6 +62,7 @@ optionsStruct& winmain::Options = options::Options;
 winmain::DurationMs winmain::SpinThreshold = DurationMs(0.005);
 WelfordState winmain::SleepState{};
 int winmain::CursorIdleCounter = 0;
+namespace { float WindowDpiScale = 1.0f; }
 
 void winmain::ConstrainNextDialog(float width, float height)
 {
@@ -69,19 +75,55 @@ void winmain::ConstrainNextDialog(float width, float height)
 	ImGui::SetNextWindowPos(ImVec2(available.x * 0.5f, available.y * 0.5f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 }
 
-void winmain::UpdateUiScale()
+void winmain::UpdateUiScale(bool rendererReady)
 {
 	float dpi = 96.0f;
+#ifdef _WIN32
+	// SDL_GetDisplayDPI reports physical density on Windows, not the selected
+	// accessibility scale. GetDpiForWindow returns the effective per-monitor DPI.
+	SDL_SysWMinfo info{};
+	SDL_VERSION(&info.version);
+	using GetWindowDpi = UINT(WINAPI*)(HWND);
+	static auto getWindowDpi = reinterpret_cast<GetWindowDpi>(GetProcAddress(GetModuleHandleW(L"user32.dll"), "GetDpiForWindow"));
+	if (getWindowDpi && SDL_GetWindowWMInfo(MainWindow, &info))
+		dpi = static_cast<float>(getWindowDpi(info.info.win.window));
+#else
 	SDL_GetDisplayDPI(SDL_GetWindowDisplayIndex(MainWindow), nullptr, &dpi, nullptr);
+#endif
 	if (!std::isfinite(dpi) || dpi <= 0) dpi = 96.0f;
-	const float scale = Clamp(dpi / 96.0f, 1.0f, 4.0f) * Options.UIScale.V;
-	// Rebuild from unscaled style; repeated monitor moves must not compound scaling.
-	if (std::abs(ImIO->FontGlobalScale - scale * 0.5f) > 0.001f)
+	WindowDpiScale = Clamp(dpi / 96.0f, 1.0f, 4.0f);
+	const float pixels = std::round(13.0f * WindowDpiScale * Options.UIScale.V);
+	if (!rendererReady || ImIO->Fonts->Fonts.empty() || ImIO->Fonts->Fonts[0]->FontSize != pixels)
 	{
+		// Rasterize at the actual display size. Downsampling a 26px pixel-snapped
+		// default font to 13px loses strokes even with a bilinear atlas texture.
+		if (rendererReady) ImGui_Render_Shutdown();
+		ImIO->Fonts->Clear();
+		ImFontConfig fontConfig{};
+		fontConfig.SizePixels = pixels;
+		ImVector<ImWchar> ranges;
+		translations::GetGlyphRange(&ranges);
+		bool loaded = false;
+		if (!Options.FontFileName.V.empty())
+		{
+			if (auto file = fopenu(Options.FontFileName.V.c_str(), "rb"))
+			{
+				fclose(file);
+				loaded = ImIO->Fonts->AddFontFromFileTTF(Options.FontFileName.V.c_str(), pixels, &fontConfig, ranges.Data) != nullptr;
+			}
+		}
+		if (!loaded) ImIO->Fonts->AddFontDefault(&fontConfig);
+		ImIO->Fonts->Build();
+		ImIO->FontDefault = nullptr;
+		ImIO->FontGlobalScale = 1.0f;
 		ImGui::GetStyle() = ImGuiStyle();
 		ImGui::StyleColorsDark();
-		ImGui::GetStyle().ScaleAllSizes(scale);
-		ImIO->FontGlobalScale = scale * 0.5f;
+		ImGui::GetStyle().ScaleAllSizes(pixels / 13.0f);
+		if (rendererReady) ImGui_Render_Init(Renderer);
+		int width, height, renderWidth, renderHeight;
+		SDL_GetWindowSize(MainWindow, &width, &height);
+		SDL_GetRendererOutputSize(Renderer, &renderWidth, &renderHeight);
+		printf("Display: effective DPI %.0f; font %.0fpx; window %dx%d; renderer %dx%d\n", dpi, pixels, width, height, renderWidth, renderHeight);
 	}
 }
 
@@ -224,42 +266,8 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 			options::ResetAllOptions();
 		}
 
-		if (!Options.FontFileName.V.empty())
-		{
-			ImVector<ImWchar> ranges;
-			translations::GetGlyphRange(&ranges);
-			ImFontConfig fontConfig{};
-
-			// ToDo: further tweak font options, maybe try imgui_freetype
-			fontConfig.OversampleV = 2;
-			fontConfig.OversampleH = 4;
-
-			// ToDo: improve font file test, checking if file exists is not enough
-			auto fontLoaded = false;
-			auto fileName = Options.FontFileName.V.c_str();
-			auto fileHandle = fopenu(fileName, "rb");
-			if (fileHandle)
-			{
-				fclose(fileHandle);
-
-				// Rasterize at twice the base size for readable high-DPI text.
-				if (io.Fonts->AddFontFromFileTTF(fileName, 26.f, &fontConfig, ranges.Data))
-					fontLoaded = true;
-			}
-
-			if (!fontLoaded)
-				printf("Failed to load font: %s, using embedded font.\n", fileName);
-		}
-		if (io.Fonts->Fonts.empty())
-		{
-			ImFontConfig fontConfig{};
-			fontConfig.SizePixels = 26.f;
-			io.Fonts->AddFontDefault(&fontConfig);
-		}
+		UpdateUiScale(false);
 		ImGui_Render_Init(renderer);
-		ImGui::StyleColorsDark();
-		io.FontGlobalScale = 0;
-		UpdateUiScale();
 
 		ImGui_ImplSDL2_InitForSDLRenderer(window, Renderer);
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
@@ -318,8 +326,8 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 		}
 
 		auto resInfo = &fullscrn::resolution_array[fullscrn::GetResolution()];
-		SetWindowSize(Options.WindowWidth > 0 ? Options.WindowWidth.V : resInfo->TableWidth,
-			Options.WindowHeight > 0 ? Options.WindowHeight.V : resInfo->TableHeight + 32);
+		SetWindowSize(Options.WindowWidth > 0 ? Options.WindowWidth.V : int(resInfo->TableWidth * WindowDpiScale),
+			Options.WindowHeight > 0 ? Options.WindowHeight.V : int((resInfo->TableHeight + 32) * WindowDpiScale));
 		if (Options.WindowMaximized && !Options.FullScreen) SDL_MaximizeWindow(MainWindow);
 		SDL_SetWindowTitle(MainWindow, ModeSelection::WindowTitle());
 		SDL_ShowWindow(window);

@@ -20,11 +20,16 @@ Windows; only the effective resolution is clamped, not the preference. These
 are scaled historical images, not newly drawn HD assets.
 
 On Windows SDL requests per-monitor DPI awareness before initialization.
-Renderer, mouse and window coordinates remain pixels. The display DPI scales
+Renderer, mouse and window coordinates remain pixels. The effective window DPI (GetDpiForWindow on Windows 10+) scales
 both ImGui text and padding; the existing UI Scale option is a further user
-factor (0.8 to 3). The font is rasterized at 26 pixels and displayed relative to
-the original 13-pixel size. Moving between monitors updates the scale without
-restarting or compounding style scaling. Systems that cannot report DPI fall
+factor (0.8 to 3). Fonts are rasterized at their actual rounded display size (13 pixels times
+DPI and user scaling), with FontGlobalScale fixed to 1: e.g. 20 pixels at 144 DPI.
+The atlas is rebuilt between frames only when this pixel size changes. This avoids
+the observed loss of strokes when reducing a 26-pixel default font to 13 pixels.
+Moving between monitors updates the scale without restarting or compounding
+style scaling. The initial window dimensions also scale with the DPI when no
+window size has been saved. A Display stdout diagnostic reports effective DPI, font size, window dimensions
+and renderer dimensions whenever the font changes. Systems that cannot report DPI fall
 back to 96 DPI. No window-DPI logical-coordinate hint is enabled.
 
 Import, startup mode selection, mode confirmation and controls dialogs are
