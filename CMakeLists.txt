@@ -76,6 +76,11 @@ set(SOURCE_FILES
         SpaceCadetPinball/pch.h
         SpaceCadetPinball/proj.cpp
         SpaceCadetPinball/proj.h
+        SpaceCadetPinball/ResourceImport.cpp
+        SpaceCadetPinball/ResourceImport.h
+        SpaceCadetPinball/ResourceCatalog.h
+        SpaceCadetPinball/ResourceAudioFingerprints.h
+        SpaceCadetPinball/ResourceSha256.h
         SpaceCadetPinball/render.cpp
         SpaceCadetPinball/render.h
         SpaceCadetPinball/score.cpp

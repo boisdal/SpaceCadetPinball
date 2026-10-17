@@ -12,6 +12,7 @@
 #include "translations.h"
 #include "font_selection.h"
 #include "FrameScheduler.h"
+#include "ResourceImport.h"
 #ifdef PINBALL_CADENCE_AUDIT
 #include "../tools/cadence_probe.h"
 #include "../tools/cadence_replay.h"
@@ -117,6 +118,7 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 
 	auto prefPath = SDL_GetPrefPath("", "SpaceCadetPinball");
 	auto basePath = SDL_GetBasePath();
+	ResourceImport::Initialize(prefPath ? prefPath : "");
 
 	// SDL mixer init
 	bool mixOpened = false, noAudio = strstr(lpCmdLine, "-noaudio") != nullptr;
@@ -220,7 +222,21 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 			}
 		};
 		searchPaths.insert(searchPaths.end(), std::begin(PlatformDataPaths), std::end(PlatformDataPaths));
-		pb::SelectDatFile(searchPaths);
+		if (!ResourceImport::SelectPreferred(Options.Prefer3DPBGameData))
+        {
+            if (!ResourceImport::HasImports()) pb::SelectDatFile(searchPaths);
+            else pb::DatFileName.clear();
+            if (pb::DatFileName.empty())
+            {
+                if (!ResourceImport::RunSetup() || !ResourceImport::SelectPreferred(Options.Prefer3DPBGameData))
+                {
+                    ImGui_Render_Shutdown();
+                    ImGui_ImplSDL2_Shutdown();
+                    ImGui::DestroyContext();
+                    break;
+                }
+            }
+        }
 
 		// Second step: run updates that depend on .DAT file selection
 		options::InitSecondary();
@@ -500,6 +516,7 @@ void winmain::MainLoop()
 
 void winmain::RenderUi()
 {
+	ResourceImport::Draw();
 	// Transparent menu bar with a button for preventing menu lockout.
 	ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4{});
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{});
@@ -739,6 +756,11 @@ void winmain::RenderUi()
 
 			if (ImGui::BeginMenu("Game Data"))
 			{
+                if (ImGui::MenuItem("Import resource folder..."))
+                {
+                    pause(false);
+                    ResourceImport::Open();
+                }
 				if (ImGui::MenuItem("Prefer 3DPB Data", nullptr, Options.Prefer3DPBGameData))
 				{
 					options::toggle(Menu1::Prefer3DPBGameData);
