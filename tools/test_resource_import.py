@@ -3,6 +3,8 @@ Usage: python tools/test_resource_import.py TEST_EXE WINDOWS_FOLDER FULL_TILT_FO
 No proprietary data is written to the repository.
 """
 import hashlib
+import ctypes
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -27,7 +29,21 @@ def main():
     before = [snapshot(windows), snapshot(full_tilt)]
     with tempfile.TemporaryDirectory(prefix='pinball-import-') as temporary:
         root = Path(temporary)
-        print(run(exe, windows, full_tilt, root / 'resources.txt').strip())
+        preferences = root / 'preferences'
+        preferences.mkdir()
+        settings = ['[Pinball][Settings]', 'Selected historical mode=full-tilt']
+        for mode, name, score in [('windows', 'WINDOWS', 123456), ('full-tilt', 'FULLTILT', 654321)]:
+            prefix = 'HighScores.' + mode + '.'
+            for index in range(5):
+                settings += [prefix + str(index) + '.Name=' + (name if index == 0 else ''),
+                             prefix + str(index) + '.Score=' + str(score if index == 0 else -999)]
+            settings += [prefix + 'Verification=' + str((sum(name.encode()) + score - 4 * 999) & 0xffffffff)]
+        score_file = preferences / 'imgui_pb.ini'
+        score_bytes = ('\n'.join(settings) + '\n').encode()
+        score_file.write_bytes(score_bytes)
+        print(run(exe, windows, full_tilt, preferences / 'resources-v1.txt').strip())
+        assert score_file.read_bytes() == score_bytes, 'import/reimport changed saved high scores'
+
         unknown = root / 'unknown'
         unknown.mkdir()
         (unknown / 'PINBALL.DAT').write_bytes(b'not a table')
@@ -43,6 +59,22 @@ def main():
         assert 'Sound unavailable:' in warning and 'SOUND1.WAV' in warning, warning
         shutil.copy2(next(p for p in windows.iterdir() if p.name.lower() == 'sound1.wav'), target)
         assert run(exe, 'inspect', incomplete).startswith('1 0 0'), 'retry after repair failed'
+        if os.name == 'nt':
+            # Real sharing violation: the file exists but another process cannot read it.
+            kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
+            kernel32.CreateFileW.argtypes = [ctypes.c_wchar_p, ctypes.c_uint32, ctypes.c_uint32,
+                                            ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p]
+            kernel32.CreateFileW.restype = ctypes.c_void_p
+            kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
+            handle = kernel32.CreateFileW(str(target), 0x80000000, 0, None, 3, 0, None)
+            assert handle not in (None, ctypes.c_void_p(-1).value), 'cannot lock copied test WAV'
+            try:
+                locked = run(exe, 'inspect', incomplete)
+                assert 'Sound unavailable:' in locked and 'SOUND1.WAV' in locked
+            finally:
+                kernel32.CloseHandle(handle)
+            assert run(exe, 'inspect', incomplete).startswith('1 0 0'), 'retry after unlocking WAV failed'
+
         target.write_bytes(b'changed wave')
         assert 'Audio differs from documented reference' in run(exe, 'inspect', incomplete)
         renamed = root / 'renamed'
@@ -63,7 +95,7 @@ def main():
             assert 'Manual mode confirmation required' in run(exe, 'inspect', variant, valid=False)
             assert run(exe, 'inspect', variant, mode).startswith('1 ' + str(mode))
             run(exe, 'inspect', variant, 1-mode, valid=False)
-            assert 'Manual mode and unknown provenance persisted' in run(exe, 'manual-persist', variant, root / ('manual-' + str(mode) + '.txt'), mode)
+            assert 'Manual mode and unknown provenance persisted' in run(exe, 'manual-persist', variant, preferences / ('manual-' + str(mode) + '.txt'), mode)
             # Unknown tables must not inherit missing-audio exceptions from a known fingerprint.
             assert 'SOUND2.WAV' in run(exe, 'inspect', variant, mode)
             mutations = []
@@ -94,6 +126,8 @@ def main():
                 dat.write_bytes(damaged)
                 run(exe, 'inspect', variant, mode, valid=False)
             dat.write_bytes(changed)
+        assert score_file.read_bytes() == score_bytes, 'validation or manual import changed saved high scores'
+        print('Both persisted high-score profiles preserved byte-for-byte; unreadable audio and retry: passed')
         print('Manual mode/provenance, wrong-mode rejection and 16 malformed DAT mutations: passed')
         print('Unknown, absent, incomplete, repaired, altered, renamed and ambiguous folders: passed')
     assert before == [snapshot(windows), snapshot(full_tilt)], 'reference folder changed'
