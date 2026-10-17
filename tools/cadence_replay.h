@@ -4,6 +4,7 @@
 #include "../SpaceCadetPinball/TBall.h"
 #include "../SpaceCadetPinball/TFlipper.h"
 #include "../SpaceCadetPinball/TFlipperEdge.h"
+#include "../SpaceCadetPinball/TPlunger.h"
 
 class CadenceReplay
 {
@@ -13,6 +14,9 @@ class CadenceReplay
     double simulated = 0;
     unsigned nextInput = 0;
     bool started = false, stalled = false;
+    struct PhysicsSample { double time; float dx, dy, boost, threshold; };
+    std::vector<PhysicsSample> physicsSamples;
+    const char* physicsScenario = std::getenv("PINBALL_PHYSICS_SCENARIO");
 public:
     bool Enabled = std::getenv("PINBALL_AUDIT_REPLAY") != nullptr;
     static int Env(const char* name, int fallback)
@@ -24,6 +28,13 @@ public:
     {
         if (!Enabled) return;
         samples.reserve(10000);
+        if (physicsScenario && std::strcmp(physicsScenario, "weak") &&
+            std::strcmp(physicsScenario, "maximum") && std::strcmp(physicsScenario, "automatic"))
+        {
+            std::fprintf(stderr, "Unknown physics scenario\n");
+            std::exit(3);
+        }
+        if (physicsScenario) physicsSamples.reserve(10000);
         options::Options.FramesPerSecond = Env("PINBALL_AUDIT_FPS", 60);
         options::Options.UpdatesPerSecond = 120;
         options::Options.UncappedUpdatesPerSecond = false;
@@ -54,6 +65,23 @@ public:
     void BeforeStep()
     {
         if (!Enabled) return;
+        if (physicsScenario)
+        {
+            auto plunger = pb::MainTable->Plunger;
+            if (nextInput == 0 && simulated + 0.0001 >= 4000)
+            {
+                plunger->Message(std::strcmp(physicsScenario, "automatic") == 0 ?
+                    MessageCode::PlungerLaunchBall : MessageCode::PlungerInputPressed, 0.0f);
+                CadenceProbe::Active()->Record('K', nextInput++);
+            }
+            const auto release = std::strcmp(physicsScenario, "weak") == 0 ? 4100 : 7000;
+            if (nextInput == 1 && std::strcmp(physicsScenario, "automatic") && simulated + 0.0001 >= release)
+            {
+                plunger->Message(MessageCode::PlungerInputReleased, 0.0f);
+                CadenceProbe::Active()->Record('K', nextInput++);
+            }
+            return;
+        }
         // Launch, then alternate and simultaneous flippers. Repeat every 2 s.
         // Allow the feed timer and the ball's bounces on the plunger to settle.
         while (nextInput < 25 && simulated + 0.0001 >= 4000 + nextInput * 500)
@@ -86,6 +114,8 @@ public:
         simulated += dt;
         auto table = pb::MainTable;
         auto ball = table->BallList.front();
+        if (physicsScenario) physicsSamples.push_back({simulated, ball->Direction.X, ball->Direction.Y,
+            table->Plunger->Boost, table->Plunger->Threshold});
         samples.push_back({simulated, ball->Position.X, ball->Position.Y, ball->Position.Z, ball->Speed,
             table->FlipperL->FlipperEdge->CurrentAngle, table->FlipperR->FlipperEdge->CurrentAngle,
             table->CurScore, ball->ActiveFlag, table->BallCount});
@@ -119,5 +149,14 @@ public:
         for (auto& s : samples) std::fprintf(file, "%.9f,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%d,%d,%d\n",
             s.time, s.x, s.y, s.z, s.speed, s.left, s.right, s.score, s.active, s.balls);
         std::fclose(file);
+        if (physicsScenario)
+        {
+            file = std::fopen((std::string(path) + ".physics.csv").c_str(), "w");
+            if (!file) return;
+            std::fprintf(file, "time_ms,direction_x,direction_y,plunger_boost,plunger_threshold\n");
+            for (auto& s : physicsSamples) std::fprintf(file, "%.9f,%.9g,%.9g,%.9g,%.9g\n",
+                s.time, s.dx, s.dy, s.boost, s.threshold);
+            std::fclose(file);
+        }
     }
 };

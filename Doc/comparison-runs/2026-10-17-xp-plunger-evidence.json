@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "reference": "windows-xp-x86-en",
+  "exe_sha256": "2bbc8234685fe2f6324040af6ea20123cf00c4a56882ce0d9074f0beefac67bc",
+  "method": "hash-gated PE reads; static evidence only",
+  "constructor_va": "0x101a4f3",
+  "vtable_va": "0x1002750",
+  "message_va": "0x10185ad",
+  "collision_va": "0x101875f",
+  "automatic_launch_message": 1017,
+  "automatic_launch_branch_va": "0x1018691",
+  "automatic_launch_reset_callback_va": "0x10173c8",
+  "automatic_launch_delay_seconds": 0.20000000298023224,
+  "maximum_pullback": 100,
+  "pullback_dividend": 100.0,
+  "pullback_bitmap_multiplier": 8.0,
+  "manual_release_delay_seconds": 0.02500000037252903,
+  "limits": [
+    "No dynamic original trajectory measured",
+    "No conclusion about general flipper or rebound fidelity"
+  ]
+}

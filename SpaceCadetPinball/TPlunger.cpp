@@ -97,6 +97,15 @@ int TPlunger::Message(MessageCode code, float value)
 		loader::play_sound(SoundIndexP1, this, "TPlunger2");
 		break;
 	case MessageCode::PlungerLaunchBall:
+		if (!pb::FullTiltMode)
+		{
+			// XP's menu launch keeps the impulse available for 200 ms. This
+			// differs from releasing a manually pulled plunger (25 ms).
+			Threshold = 0.0f;
+			Boost = MaxPullback;
+			timer::set(0.2f, this, ReleasedTimer);
+			break;
+		}
 		PullbackStartedFlag = true;
 		Boost = MaxPullback;
 		Message(MessageCode::PlungerInputReleased, 0.0f);
