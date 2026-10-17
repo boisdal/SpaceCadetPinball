@@ -13,6 +13,7 @@
 #include "font_selection.h"
 #include "FrameScheduler.h"
 #include "ResourceImport.h"
+#include "ModeSelection.h"
 #ifdef PINBALL_CADENCE_AUDIT
 #include "../tools/cadence_probe.h"
 #include "../tools/cadence_replay.h"
@@ -222,20 +223,12 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 			}
 		};
 		searchPaths.insert(searchPaths.end(), std::begin(PlatformDataPaths), std::end(PlatformDataPaths));
-		if (!ResourceImport::SelectPreferred(Options.Prefer3DPBGameData))
+        if (!ModeSelection::Prepare(searchPaths))
         {
-            if (!ResourceImport::HasImports()) pb::SelectDatFile(searchPaths);
-            else pb::DatFileName.clear();
-            if (pb::DatFileName.empty())
-            {
-                if (!ResourceImport::RunSetup() || !ResourceImport::SelectPreferred(Options.Prefer3DPBGameData))
-                {
-                    ImGui_Render_Shutdown();
-                    ImGui_ImplSDL2_Shutdown();
-                    ImGui::DestroyContext();
-                    break;
-                }
-            }
+            ImGui_Render_Shutdown();
+            ImGui_ImplSDL2_Shutdown();
+            ImGui::DestroyContext();
+            break;
         }
 
 		// Second step: run updates that depend on .DAT file selection
@@ -278,6 +271,7 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 			auto resInfo = &fullscrn::resolution_array[fullscrn::GetResolution()];
 			SDL_SetWindowSize(MainWindow, resInfo->TableWidth, resInfo->TableHeight);
 		}
+		SDL_SetWindowTitle(MainWindow, ModeSelection::WindowTitle());
 		SDL_ShowWindow(window);
 		fullscrn::set_screen_mode(Options.FullScreen);
 
@@ -338,7 +332,7 @@ void winmain::MainLoop()
 				auto elapsedSec = DurationMs(curTime - prevTime).count() * 0.001;
 				snprintf(buf, sizeof buf, "Updates/sec = %02.02f Frames/sec = %02.02f ",
 				         updateCounter / elapsedSec, frameCounter / elapsedSec);
-				SDL_SetWindowTitle(MainWindow, buf);
+				SDL_SetWindowTitle(MainWindow, (std::string(ModeSelection::WindowTitle()) + " - " + buf).c_str());
 				FpsDetails = buf;
 				frameCounter = updateCounter = 0;
 				prevTime = curTime;
@@ -517,6 +511,7 @@ void winmain::MainLoop()
 void winmain::RenderUi()
 {
 	ResourceImport::Draw();
+	ModeSelection::DrawConfirmation();
 	// Transparent menu bar with a button for preventing menu lockout.
 	ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4{});
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{});
@@ -761,10 +756,7 @@ void winmain::RenderUi()
                     pause(false);
                     ResourceImport::Open();
                 }
-				if (ImGui::MenuItem("Prefer 3DPB Data", nullptr, Options.Prefer3DPBGameData))
-				{
-					options::toggle(Menu1::Prefer3DPBGameData);
-				}
+                ModeSelection::DrawMenu();
 				ImGui::EndMenu();
 			}
 			ImGui::Separator();
@@ -997,7 +989,7 @@ int winmain::event_handler(const SDL_Event* event)
 			}
 			break;
 		case SDLK_y:
-			SDL_SetWindowTitle(MainWindow, "Pinball");
+			SDL_SetWindowTitle(MainWindow, ModeSelection::WindowTitle());
 			DispFrameRate ^= true;
 			break;
 		case SDLK_F1:

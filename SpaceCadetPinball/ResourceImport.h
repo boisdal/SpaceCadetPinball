@@ -5,7 +5,7 @@ namespace ResourceImport
 {
 void Initialize(const std::string& preferencesDirectory);
 ResourceCatalog& Catalog();
-// Selects the preferred registered table, falling back only if that slot is empty.
+// Selects exactly the requested registered table; never falls back to another mode.
 // Returns false for absent/unavailable imports; never silently loads an invalid entry.
 bool SelectPreferred(bool preferWindows);
 bool HasImports();

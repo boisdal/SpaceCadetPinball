@@ -76,6 +76,8 @@ set(SOURCE_FILES
         SpaceCadetPinball/pch.h
         SpaceCadetPinball/proj.cpp
         SpaceCadetPinball/proj.h
+        SpaceCadetPinball/ModeSelection.cpp
+        SpaceCadetPinball/ModeSelection.h
         SpaceCadetPinball/ResourceImport.cpp
         SpaceCadetPinball/ResourceImport.h
         SpaceCadetPinball/ResourceCatalog.h

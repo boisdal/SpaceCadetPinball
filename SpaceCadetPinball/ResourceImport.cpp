@@ -63,7 +63,7 @@ ResourceCatalog& ResourceImport::Catalog(){return *catalog;}
 bool ResourceImport::HasImports(){return !catalog->Get(false).empty() || !catalog->Get(true).empty();}
 bool ResourceImport::SelectPreferred(bool preferWindows)
 {
-    bool mode=!preferWindows;if(catalog->Get(mode).empty())mode=!mode;
+    bool mode=!preferWindows;
     if(catalog->Get(mode).empty())return false;
     auto data=ResourceCatalog::Inspect(catalog->Get(mode));
     if(!data.valid || data.fullTilt!=mode)
