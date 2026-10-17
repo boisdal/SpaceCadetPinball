@@ -6,7 +6,7 @@ import pathlib
 import struct
 
 
-def inspect(path):
+def inspect(path, allow_audit=False):
     data = path.read_bytes()
     def u16(offset): return struct.unpack_from('<H', data, offset)[0]
     def u32(offset): return struct.unpack_from('<I', data, offset)[0]
@@ -45,10 +45,11 @@ def inspect(path):
     assert not unknown, f'Non-system imports: {sorted(unknown)}'
     for notice in [b'SDL 2.30.11', b'SDL_mixer 2.8.0', b'Dear ImGui', b'MIT License']:
         assert notice in data, f'Missing embedded notice: {notice!r}'
-    assert b'PINBALL_AUDIT_INI' not in data and b'PINBALL_CADENCE_CSV' not in data, 'Audit instrumentation in release'
+    instrumented = b'PINBALL_AUDIT_INI' in data or b'PINBALL_CADENCE_CSV' in data
+    assert allow_audit or not instrumented, 'Audit instrumentation in release'
     assert u16(optional+68) == 2, 'Expected Windows GUI subsystem'
     return {'file': path.name, 'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest(),
-            'architecture': 'x64', 'imports': sorted(imports), 'embedded_notices': True,
+            'architecture': 'x64', 'imports': sorted(imports), 'embedded_notices': True, 'audit_instrumentation': instrumented,
             'scope': 'Static PE inspection; not a clean-machine interactive test.'}
 
 
@@ -56,8 +57,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('executable', type=pathlib.Path)
     parser.add_argument('--json', type=pathlib.Path)
+    parser.add_argument('--allow-audit', action='store_true', help='Inspect a test build; never use for distributed artifacts')
     args = parser.parse_args()
-    result = inspect(args.executable)
+    result = inspect(args.executable, args.allow_audit)
     output = json.dumps(result, indent=2)+'\n'
     if args.json:
         args.json.write_text(output, encoding='utf-8')

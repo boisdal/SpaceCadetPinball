@@ -1,7 +1,7 @@
 {
   "file": "SpaceCadetPinball.exe",
-  "bytes": 4096512,
-  "sha256": "b292dda8eb346ffc4535be436397fa8350dcab9651ed49798ae2880f03fef86a",
+  "bytes": 4099584,
+  "sha256": "c88bc2737fcf1ea0b90c7cf07defba547f4144ca60bc8f41573cf8fa5730e5f7",
   "architecture": "x64",
   "imports": [
     "advapi32.dll",
@@ -30,12 +30,14 @@
     "winmm.dll"
   ],
   "embedded_notices": true,
+  "audit_instrumentation": false,
   "scope": "Static PE inspection; not a clean-machine interactive test.",
   "validation": {
+    "source_integration": "04c998d (includes font fix 68ff1b4)",
     "license_export": "exit 0 and bytes match source notices",
     "existing_license_file": "exit 1 and bytes unchanged",
     "clean_windows_without_development_tools": "not performed; Windows Sandbox unavailable",
     "linux_macos_builds": "not performed in this Windows workspace",
-    "display_32": "not included in this candidate; rebuild after integration"
+    "interactive": "root agent validates separately"
   }
 }
