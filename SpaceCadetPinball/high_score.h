@@ -1,10 +1,6 @@
 #pragma once
 
-struct high_score_struct
-{
-	char Name[32];
-	int Score;
-};
+#include "high_score_storage.h"
 
 struct high_score_entry
 {	

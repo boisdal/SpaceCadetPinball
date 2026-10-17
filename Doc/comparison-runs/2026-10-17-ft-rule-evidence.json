@@ -1,0 +1,390 @@
+{
+  "schema_version": 1,
+  "method": "static_pe_disassembly",
+  "reference": {
+    "sha1": "3f7b5699074b83fd713657cd94671f2156dbedc4",
+    "sha256": "b82e1f15d70f812d008453d3e44c2bde28fc1105056de99e51dea38e05cf3dc4"
+  },
+  "previous": {
+    "sha1": "cff7a1f01a039f24260cd9e9384924ab10b19878",
+    "sha256": "6017817caa722c1f0a51059738d18a8382a4e90f7e89194ffdea8ccff5a57654"
+  },
+  "source_sha256": "ce08a03629c46431902c5a30d65d7e92c0deb0f30140280368fc511873957d6c",
+  "image_base": "0x400000",
+  "sections": [
+    {
+      "name": ".text",
+      "rva": "0x1000",
+      "raw_size": 200704,
+      "sha256": "2e5450410d371f319dced560eccdf68e5cf0574367b8b66c360b11b832c719c1",
+      "same_as_previous": true
+    },
+    {
+      "name": ".bss",
+      "rva": "0x32000",
+      "raw_size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "same_as_previous": true
+    },
+    {
+      "name": ".rdata",
+      "rva": "0x35000",
+      "raw_size": 3072,
+      "sha256": "62d3ca8117d32d518820c4b5d773dbb36b3b8c13b34fb50e30bcf2b4cb4a9fb3",
+      "same_as_previous": true
+    },
+    {
+      "name": ".data",
+      "rva": "0x36000",
+      "raw_size": 20992,
+      "sha256": "1fecd5ed01ee1f19bab4fc454af168b1e19eb5a4885a364b3294edb1403e4878",
+      "same_as_previous": true
+    },
+    {
+      "name": ".idata",
+      "rva": "0x3c000",
+      "raw_size": 5120,
+      "sha256": "df7ef42745b35fb85cb77753faf5b861033cbeefbdfd2992b5c3a43fb63cfa23",
+      "same_as_previous": false
+    },
+    {
+      "name": ".edata",
+      "rva": "0x3e000",
+      "raw_size": 512,
+      "sha256": "f54c07fe8ea83b9d98437ff0ab8f7c80dc96ad044313b529cbfc6e81876b381c",
+      "same_as_previous": true
+    },
+    {
+      "name": ".rsrc",
+      "rva": "0x3f000",
+      "raw_size": 252416,
+      "sha256": "627d68dea0285bd4433c76500c2a0b72b52e9d19496da05e3acec5ba70f783bd",
+      "same_as_previous": false
+    },
+    {
+      "name": ".reloc",
+      "rva": "0x7d000",
+      "raw_size": 15360,
+      "sha256": "0271597107ebe2353f0080869c5234aef49cb4b331952112408cad119b31886b",
+      "same_as_previous": null
+    }
+  ],
+  "missions": [
+    {
+      "state": 0,
+      "function": "WaitingDeploymentController",
+      "start": "0x426680",
+      "end": "0x426720",
+      "replay_calls": []
+    },
+    {
+      "state": 1,
+      "function": "SelectMissionController",
+      "start": "0x4267e0",
+      "end": "0x426e90",
+      "replay_calls": []
+    },
+    {
+      "state": 2,
+      "function": "PracticeMissionController",
+      "start": "0x426e90",
+      "end": "0x427060",
+      "replay_calls": [
+        {
+          "address": "0x426f2e",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 3,
+      "function": "LaunchTrainingController",
+      "start": "0x427060",
+      "end": "0x4271f0",
+      "replay_calls": [
+        {
+          "address": "0x4270d7",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 4,
+      "function": "ReentryTrainingController",
+      "start": "0x4271f0",
+      "end": "0x4273e0",
+      "replay_calls": [
+        {
+          "address": "0x427278",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 5,
+      "function": "ScienceMissionController",
+      "start": "0x4273e0",
+      "end": "0x4276c0",
+      "replay_calls": [
+        {
+          "address": "0x4274b4",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 6,
+      "function": "StrayCometController",
+      "start": "0x4276c0",
+      "end": "0x4278d0",
+      "replay_calls": [
+        {
+          "address": "0x427754",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 7,
+      "function": "BlackHoleThreatController",
+      "start": "0x427ae0",
+      "end": "0x427dd0",
+      "replay_calls": [
+        {
+          "address": "0x427baf",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 8,
+      "function": "SpaceRadiationController",
+      "start": "0x4278d0",
+      "end": "0x427ae0",
+      "replay_calls": [
+        {
+          "address": "0x427963",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 9,
+      "function": "BugHuntController",
+      "start": "0x427dd0",
+      "end": "0x4281a0",
+      "replay_calls": [
+        {
+          "address": "0x427f41",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 10,
+      "function": "AlienMenaceController",
+      "start": "0x4284b0",
+      "end": "0x4285b0",
+      "replay_calls": []
+    },
+    {
+      "state": 11,
+      "function": "RescueMissionController",
+      "start": "0x4281a0",
+      "end": "0x4284b0",
+      "replay_calls": [
+        {
+          "address": "0x428298",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 12,
+      "function": "SatelliteController",
+      "start": "0x4287b0",
+      "end": "0x428940",
+      "replay_calls": [
+        {
+          "address": "0x428827",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 13,
+      "function": "ReconnaissanceController",
+      "start": "0x428940",
+      "end": "0x428bb0",
+      "replay_calls": [
+        {
+          "address": "0x428a52",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 14,
+      "function": "DoomsdayMachineController",
+      "start": "0x428bb0",
+      "end": "0x428d60",
+      "replay_calls": [
+        {
+          "address": "0x428c3e",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 15,
+      "function": "CosmicPlagueController",
+      "start": "0x428d60",
+      "end": "0x428eb0",
+      "replay_calls": []
+    },
+    {
+      "state": 16,
+      "function": "SecretMissionYellowController",
+      "start": "0x429000",
+      "end": "0x4290f0",
+      "replay_calls": []
+    },
+    {
+      "state": 17,
+      "function": "TimeWarpController",
+      "start": "0x429300",
+      "end": "0x429420",
+      "replay_calls": []
+    },
+    {
+      "state": 18,
+      "function": "MaelstromController",
+      "start": "0x4296a0",
+      "end": "0x429800",
+      "replay_calls": []
+    },
+    {
+      "state": 19,
+      "function": "QuoteController",
+      "start": "0x426720",
+      "end": "0x4267e0",
+      "replay_calls": []
+    },
+    {
+      "state": 20,
+      "function": "AlienMenacePartTwoController",
+      "start": "0x4285b0",
+      "end": "0x4287b0",
+      "replay_calls": [
+        {
+          "address": "0x42864f",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 21,
+      "function": "CosmicPlaguePartTwoController",
+      "start": "0x428eb0",
+      "end": "0x429000",
+      "replay_calls": [
+        {
+          "address": "0x428f13",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 22,
+      "function": "SecretMissionRedController",
+      "start": "0x4290f0",
+      "end": "0x4291a0",
+      "replay_calls": []
+    },
+    {
+      "state": 23,
+      "function": "SecretMissionGreenController",
+      "start": "0x4291a0",
+      "end": "0x429300",
+      "replay_calls": [
+        {
+          "address": "0x4291ee",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 24,
+      "function": "TimeWarpPartTwoController",
+      "start": "0x429420",
+      "end": "0x4296a0",
+      "replay_calls": []
+    },
+    {
+      "state": 25,
+      "function": "MaelstromPartTwoController",
+      "start": "0x429800",
+      "end": "0x4299c0",
+      "replay_calls": []
+    },
+    {
+      "state": 26,
+      "function": "MaelstromPartThreeController",
+      "start": "0x4299c0",
+      "end": "0x429b90",
+      "replay_calls": []
+    },
+    {
+      "state": 27,
+      "function": "MaelstromPartFourController",
+      "start": "0x429b90",
+      "end": "0x429c20",
+      "replay_calls": []
+    },
+    {
+      "state": 28,
+      "function": "MaelstromPartFiveController",
+      "start": "0x429c20",
+      "end": "0x429cb0",
+      "replay_calls": []
+    },
+    {
+      "state": 29,
+      "function": "MaelstromPartSixController",
+      "start": "0x429cb0",
+      "end": "0x429db0",
+      "replay_calls": []
+    },
+    {
+      "state": 30,
+      "function": "MaelstromPartSevenController",
+      "start": "0x429db0",
+      "end": "0x429e60",
+      "replay_calls": []
+    },
+    {
+      "state": 31,
+      "function": "MaelstromPartEightController",
+      "start": "0x429e60",
+      "end": "0x429fc0",
+      "replay_calls": [
+        {
+          "address": "0x429ed2",
+          "previous_instruction": "push 0xbf800000"
+        }
+      ]
+    },
+    {
+      "state": 32,
+      "function": "GameoverController",
+      "start": "0x429fc0",
+      "end": "0x42a240",
+      "replay_calls": []
+    }
+  ],
+  "limitations": [
+    "Names are mapped from source dispatch, not historical symbols.",
+    "Calls do not establish runtime reachability or transition behavior.",
+    "No dynamic observation or audio listening is performed."
+  ]
+}

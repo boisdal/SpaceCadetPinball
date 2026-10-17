@@ -5034,6 +5034,13 @@ const TextArray translations::Translations =
 		},
 	},
 	{
+		Msg::HIGHSCORES_Legacy,
+		{
+			{ Lang::English, "Legacy scores - unknown mode (read-only)" },
+			{ Lang::French, "Records hérités - mode inconnu (lecture seule)" },
+		},
+	},
+	{
 		Msg::HIGHSCORES_Caption,
 		{
 			{ Lang::Arabic, "أفضل النتائج" },

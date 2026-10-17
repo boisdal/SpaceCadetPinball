@@ -197,7 +197,7 @@ La cadence a été relevée dans un [passage complémentaire](cadence-measuremen
 avec outil, durée d'échantillonnage, pauses et méthode explicités.
 Une vidéo peut vérifier l'animation ; des FPS vidéo seuls ne mesurent pas les UPS
 du moteur. Le scénario de score et L1 sont réalisés pour les quatre cibles.
-La matrice détaillée des écarts de règles relève de #22 ; ne pas déduire un défaut
+La [matrice détaillée des écarts de règles](behavior-comparison-matrix.md) relève de #22 ; ne pas déduire un défaut
 confirmé des seuls scores finaux différents de ce corpus.
 
 ## Écart signalé pendant la validation manuelle : entry lanes Full Tilt
