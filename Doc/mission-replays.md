@@ -66,3 +66,37 @@ validation, not a claim made by this test harness.
 On 2026-10-17 the event harness passed with Zig 0.13.0, and the normal x64
 build succeeded with SDL 2.30.11 / SDL_mixer 2.8.0. Local executable SHA-256:
 `e624c5824710da4eba2dae8b16569d94915afe05bde5df2dd95717dddf0f5c42`.
+
+## Real component and timer integration (2026-10-17)
+
+A second audit runs the complete fork with authentic local resources, using
+SDL's dummy video/audio drivers and `-noaudio` (no visible window). It uses no
+component doubles. Build with `tools/build_comparison_windows.ps1 -CadenceAudit`
+and the pinned dependency paths, then run once per resource directory:
+
+```text
+python tools/run_mission_replay_audit.py --exe <audit-build>/SpaceCadetPinball.exe --data <original-resource-directory> --output <new-result-directory>
+```
+
+The audit starts a real two-player game and initializes Practice Mission through
+`MissionControl`. Only its remaining hit counter is shortened to one before a
+collision event is delivered to the real controller. The Full Tilt award appears
+in the real `TTextBox` queue and lights the real `TLight`; Windows gets neither.
+The actual table player switch stores and restores the replay for player one
+without giving it to player two. A real `TDrain::Collision` consumes the award;
+normal simulation steps execute the real drain and plunger timers and produce
+an active replacement ball. A second award followed by `TPinballTable::tilt`
+and a real drain loses player one's ball, advances to player two, and feeds that
+player's ball without transferring the replay. For the Windows lifecycle portion
+only, the existing replay helper grants the initial replay after the negative
+mission-award check.
+
+Both 18-second runs completed with all 19 checks passing. Results include the
+executable and resource hashes:
+[Full Tilt](comparison-runs/2026-10-17-issue23-full-tilt.json) and
+[Windows](comparison-runs/2026-10-17-issue23-windows.json).
+This closes the component/timer coverage gap of the extracted-controller tests
+for the replay lifecycle. It does not constitute visual/audio observation, nor
+execution of the original binary. Sixteen mission branches are covered by the
+earlier event harness; the real-component integration uses Practice Mission as
+the representative terminal event.

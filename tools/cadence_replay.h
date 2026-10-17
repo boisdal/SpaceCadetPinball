@@ -4,10 +4,12 @@
 #include "../SpaceCadetPinball/TBall.h"
 #include "../SpaceCadetPinball/TFlipper.h"
 #include "../SpaceCadetPinball/TFlipperEdge.h"
+#include "mission_replay_audit.h"
 #include "../SpaceCadetPinball/TPlunger.h"
 
 class CadenceReplay
 {
+    MissionReplayAudit missionReplay;
     struct Sample { double time; float x, y, z, speed, left, right; int score, active, balls; };
     std::vector<Sample> samples;
     std::chrono::steady_clock::time_point created = std::chrono::steady_clock::now();
@@ -65,6 +67,7 @@ public:
     void BeforeStep()
     {
         if (!Enabled) return;
+        if (missionReplay.Enabled) { missionReplay.BeforeStep(simulated); return; }
         if (physicsScenario)
         {
             auto plunger = pb::MainTable->Plunger;
