@@ -61,7 +61,11 @@ On Windows, 17 October 2026:
 - `tools/test_resource_import.py`: unknown, absent, incomplete, repaired, modified
   audio, renamed DAT and ambiguous folders; SHA-256 of both source trees unchanged.
 - Full game built with Zig 0.13, SDL 2.30.11, SDL_mixer 2.8.0, normal and audit builds.
-- Interactive UI validation remains to be performed by the integration agent.
+- Interactive check on the audit build: first-launch cancellation quits without
+  creating a registry; relaunch, inspect the XP folder, recognize its table and
+  known absent sounds, remember the folder, and display the Windows table.
+  The isolated registry retains the source after normal shutdown. Adding the
+  second mode and unknown variants remain separate checks.
 
 Compile `tests/resource_catalog_test.cpp` with C++11, then run:
 
