@@ -39,6 +39,13 @@ sources, persistence across separate processes, and a missing Full Tilt DAT whil
 Windows remains available. Failed selection must preserve the saved choice and must
 not load the other table. Audio warnings are expected for these DAT-only fixtures.
 
-The normal Windows build also compiles. Interactive confirmation/cancellation and
-the startup chooser require a desktop pass; the integration executable does not
-claim to simulate user clicks or validate visual layout.
+Desktop verification on 17 October 2026 used isolated preferences and registry:
+Windows-only startup enabled Windows and explained the disabled Full Tilt choice.
+Importing Full Tilt during a Windows game retained the current paused game.
+Cancelling the mode confirmation retained Windows and its pause state; confirming
+started Full Tilt with ball 1 and score 0. The title displayed the selected mode.
+After shutdown and restart, Full Tilt loaded directly from the saved choice.
+A separate registry fixture pointed Full Tilt at an absent folder while leaving
+Windows available: startup explained the unavailable saved source and required an
+explicit choice, without loading Windows automatically. Original source folders
+and the player's preferences were not modified.

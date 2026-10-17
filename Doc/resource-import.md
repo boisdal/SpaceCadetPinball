@@ -81,8 +81,11 @@ On Windows, 17 October 2026:
 - Interactive check on the audit build: first-launch cancellation quits without
   creating a registry; relaunch, inspect the XP folder, recognize its table and
   known absent sounds, remember the folder, and display the Windows table.
-  The isolated registry retains the source after normal shutdown. Adding the
-  second mode and unknown variants remain separate checks.
+  The isolated registry retains the source after normal shutdown. Adding Full
+  Tilt through the in-game form recognizes and retains the second source while
+  preserving the current paused Windows game; both locations survive restart.
+  Unknown variants, incomplete folders and repair are covered by the automated
+  catalog tests above; their interactive form remains a separate desktop check.
 
 Compile `tests/resource_catalog_test.cpp` with C++11, then run:
 
