@@ -1,10 +1,20 @@
 cmake_minimum_required(VERSION 3.0...3.5)
+option(PINBALL_WINDOWS_STANDALONE "Statically link the Windows release dependencies" OFF)
+if(PINBALL_WINDOWS_STANDALONE)
+    cmake_minimum_required(VERSION 3.24)
+    cmake_policy(SET CMP0091 NEW)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 project(SpaceCadetPinball)
 
 set(CMAKE_CXX_STANDARD 11)
 
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/bin)
+if(PINBALL_WINDOWS_STANDALONE)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+else()
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/bin)
+endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/CMakeModules")
 
@@ -32,10 +42,16 @@ endif()
 # SDL2main is not needed
 set(SDL2_BUILDING_LIBRARY ON)
 
-find_package(SDL2 REQUIRED)
-FIND_PACKAGE(SDL2_mixer REQUIRED)
-
-include_directories(${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIR})
+if(PINBALL_WINDOWS_STANDALONE)
+    if(NOT WIN32 OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+        message(FATAL_ERROR "The standalone release targets Windows x64 only")
+    endif()
+    include(CMakeModules/WindowsStandalone.cmake)
+else()
+    find_package(SDL2 REQUIRED)
+    find_package(SDL2_mixer REQUIRED)
+    include_directories(${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIR})
+endif()
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})
   message(STATUS "Include dir='${dir}'")
@@ -225,10 +241,23 @@ if(${CMAKE_VERSION} VERSION_GREATER "3.16.0" OR ${CMAKE_VERSION} VERSION_EQUAL "
             )
 endif()
 
-target_link_libraries(SpaceCadetPinball ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY})
+if(PINBALL_WINDOWS_STANDALONE)
+    target_link_libraries(SpaceCadetPinball SDL2::SDL2-static SDL2_mixer::SDL2_mixer-static)
+    target_compile_definitions(SpaceCadetPinball PRIVATE PINBALL_STANDALONE)
+    set_target_properties(SpaceCadetPinball PROPERTIES WIN32_EXECUTABLE TRUE)
+    if(MINGW)
+        target_link_options(SpaceCadetPinball PRIVATE -Wl,--subsystem,windows)
+    endif()
+    configure_file(Platform/Windows/Notices.rc.in ${CMAKE_CURRENT_BINARY_DIR}/Notices.rc @ONLY)
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/Notices.rc PROPERTIES
+        OBJECT_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Platform/Windows/THIRD-PARTY-NOTICES.txt")
+    target_sources(SpaceCadetPinball PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/Notices.rc)
+else()
+    target_link_libraries(SpaceCadetPinball ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY})
+endif()
 
 # On Windows, copy DLL to output
-if(WIN32)
+if(WIN32 AND NOT PINBALL_WINDOWS_STANDALONE)
     list(GET SDL2_LIBRARY -1 SDL2_DLL_PATH)
     list(GET SDL2_MIXER_LIBRARY -1 SDL2_MIXER_DLL_PATH)
     get_filename_component(SDL2_DLL_PATH ${SDL2_DLL_PATH} DIRECTORY)

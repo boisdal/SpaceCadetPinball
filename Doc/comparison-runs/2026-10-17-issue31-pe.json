@@ -1,0 +1,33 @@
+{
+  "file": "SpaceCadetPinball.exe",
+  "bytes": 3723776,
+  "sha256": "19c84582c43eba2a2f368140adfd957f8e377faa304e9743698858420549c27f",
+  "architecture": "x64",
+  "imports": [
+    "advapi32.dll",
+    "api-ms-win-crt-convert-l1-1-0.dll",
+    "api-ms-win-crt-environment-l1-1-0.dll",
+    "api-ms-win-crt-filesystem-l1-1-0.dll",
+    "api-ms-win-crt-heap-l1-1-0.dll",
+    "api-ms-win-crt-locale-l1-1-0.dll",
+    "api-ms-win-crt-math-l1-1-0.dll",
+    "api-ms-win-crt-private-l1-1-0.dll",
+    "api-ms-win-crt-runtime-l1-1-0.dll",
+    "api-ms-win-crt-stdio-l1-1-0.dll",
+    "api-ms-win-crt-string-l1-1-0.dll",
+    "api-ms-win-crt-time-l1-1-0.dll",
+    "api-ms-win-crt-utility-l1-1-0.dll",
+    "gdi32.dll",
+    "imm32.dll",
+    "kernel32.dll",
+    "ole32.dll",
+    "oleaut32.dll",
+    "setupapi.dll",
+    "shell32.dll",
+    "user32.dll",
+    "version.dll",
+    "winmm.dll"
+  ],
+  "embedded_notices": true,
+  "scope": "Static PE inspection; not a clean-machine interactive test."
+}
