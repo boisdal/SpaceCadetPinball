@@ -20,7 +20,7 @@ void Refresh()
     for(int mode=0;mode<2;++mode)
     {
         const auto& path=ResourceImport::Catalog().Get(mode!=0);
-        available[mode]=path.empty()?ResourceInspection{}:ResourceCatalog::Inspect(path);
+        available[mode]=path.empty()?ResourceInspection{}:ResourceImport::Catalog().InspectRegistered(mode!=0);
         if(available[mode].fullTilt!=(mode!=0))available[mode].valid=false;
     }
 }
