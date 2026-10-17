@@ -48,7 +48,7 @@ Start-Process ./SpaceCadetPinball.exe -ArgumentList '--licenses' -Wait
 ```
 
 This exports `SpaceCadetPinball-LICENSES.txt` without initializing SDL or opening
-the game. Existing files are preserved. The exact UTF-8 notices are also in
+the game. Existing files are preserved; exit code 1 indicates an export failure. The exact UTF-8 notices are also in
 `Platform/Windows/THIRD-PARTY-NOTICES.txt`: project/ImGui/imgui_sdl/stb (MIT),
 SDL/mixer (zlib), HIDAPI (BSD alternative), yuv2rgb, Zig, LLVM runtimes and MinGW.
 No runtime source has been modified by this packaging change.

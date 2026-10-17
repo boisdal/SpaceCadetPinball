@@ -17,7 +17,10 @@ if ((& $cmakeExe --version)[0] -notmatch '3\.31\.6$') { throw 'Use CMake 3.31.6 
 if ((& $ninjaExe --version) -notmatch '^1\.11\.1(\.git\.kitware\.jobserver-1)?$') { throw 'Use Ninja 1.11.1 for this release procedure.' }
 New-Item -ItemType Directory -Force -Path $BuildDirectory, $OutputDirectory | Out-Null
 $build = (Resolve-Path -LiteralPath $BuildDirectory).Path.Replace('\', '/')
-$output = (Resolve-Path -LiteralPath $OutputDirectory).Path
+$output = (Resolve-Path -LiteralPath $OutputDirectory).Path.Replace('\', '/')
+if ($build -eq $output -or $build.StartsWith($output.TrimEnd('/') + '/', [StringComparison]::OrdinalIgnoreCase)) {
+    throw 'The release directory must not contain the build directory.'
+}
 # Never package a folder with existing files: the release allowlist is one EXE.
 if (Get-ChildItem -LiteralPath $output -Force) { throw 'OutputDirectory must be empty.' }
 foreach ($language in @('cc', 'cxx')) {
@@ -42,7 +45,8 @@ set(CMAKE_CXX_ARCHIVE_FINISH "")
 "@ | Set-Content -LiteralPath "$build/zig.cmake" -Encoding ascii
 & $cmakeExe -S $repo -B $build -G Ninja "-DCMAKE_MAKE_PROGRAM=$ninjaExe" `
     "-DCMAKE_TOOLCHAIN_FILE=$build/zig.cmake" -DPINBALL_WINDOWS_STANDALONE=ON `
-    -DCMAKE_BUILD_TYPE=Release -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON
+    -DCMAKE_BUILD_TYPE=Release -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON `
+    -DCMAKE_CXX_FLAGS= -DCMAKE_C_FLAGS=
 if ($LASTEXITCODE) { throw 'CMake configure failed.' }
 & $cmakeExe --build $build --config Release --parallel $Jobs
 if ($LASTEXITCODE) { throw 'Compilation failed.' }

@@ -1,7 +1,7 @@
 Licenses of software included in this executable.
 No Microsoft or Maxis game resources are distributed.
 
-SpaceCadetPinball â€” MIT
+SpaceCadetPinball - MIT
 ============================================================
 MIT License
 
@@ -26,7 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-SDL 2.30.11 â€” zlib
+SDL 2.30.11 - zlib
 ============================================================
 Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
   
@@ -48,7 +48,7 @@ freely, subject to the following restrictions:
 
 
 
-SDL_mixer 2.8.0 â€” zlib
+SDL_mixer 2.8.0 - zlib
 ============================================================
 Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
@@ -69,7 +69,7 @@ freely, subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 
 
-Dear ImGui â€” MIT
+Dear ImGui - MIT
 ============================================================
 The MIT License (MIT)
 
@@ -94,7 +94,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-imgui_sdl â€” MIT
+imgui_sdl - MIT
 ============================================================
 MIT License
 
@@ -119,7 +119,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-stb_truetype, stb_rect_pack, stb_textedit â€” MIT
+stb_truetype, stb_rect_pack, stb_textedit - MIT
 ALTERNATIVE A - MIT License
 Copyright (c) 2017 Sean Barrett
 Permission is hereby granted, free of charge, to any person obtaining a copy of

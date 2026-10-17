@@ -40,11 +40,12 @@ def inspect(path):
     # API-set contracts are shipped with the minimum supported OS, Windows 10.
     allowed.update('api-ms-win-crt-'+name+'-l1-1-0.dll' for name in
                    ['convert', 'environment', 'filesystem', 'heap', 'locale', 'math',
-                    'private', 'runtime', 'stdio', 'string', 'time', 'utility'])
+                    'multibyte', 'private', 'runtime', 'stdio', 'string', 'time', 'utility'])
     unknown = set(imports)-allowed
     assert not unknown, f'Non-system imports: {sorted(unknown)}'
     for notice in [b'SDL 2.30.11', b'SDL_mixer 2.8.0', b'Dear ImGui', b'MIT License']:
         assert notice in data, f'Missing embedded notice: {notice!r}'
+    assert b'PINBALL_AUDIT_INI' not in data and b'PINBALL_CADENCE_CSV' not in data, 'Audit instrumentation in release'
     assert u16(optional+68) == 2, 'Expected Windows GUI subsystem'
     return {'file': path.name, 'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest(),
             'architecture': 'x64', 'imports': sorted(imports), 'embedded_notices': True,

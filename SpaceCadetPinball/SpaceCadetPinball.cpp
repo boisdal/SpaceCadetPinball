@@ -5,10 +5,10 @@
 #include <windows.h>
 
 // The release is one file. Its notices remain available without game resources.
-static bool ExportLicenses(const char* commandLine)
+static int ExportLicenses(const char* commandLine)
 {
     if (strcmp(commandLine, "--licenses") != 0)
-        return false;
+        return -1;
     auto module = GetModuleHandleW(nullptr);
     auto resource = FindResourceW(module, MAKEINTRESOURCEW(101), MAKEINTRESOURCEW(10));
     auto data = resource ? LoadResource(module, resource) : nullptr;
@@ -22,9 +22,7 @@ static bool ExportLicenses(const char* commandLine)
         WriteFile(file, bytes, length, &written, nullptr) && written == length;
     if (file != INVALID_HANDLE_VALUE)
         CloseHandle(file);
-    if (!success)
-        MessageBoxW(nullptr, L"Unable to create SpaceCadetPinball-LICENSES.txt. Choose a writable folder where this file does not already exist.", L"Licenses", MB_OK | MB_ICONERROR);
-    return true;
+    return success ? 0 : 1;
 }
 #endif
 
@@ -39,7 +37,8 @@ int main(int argc, char* argv[])
 	}
 
 #if defined(_WIN32) && defined(PINBALL_STANDALONE)
-    if (ExportLicenses(cmdLine.c_str())) return 0;
+    const auto licenseResult = ExportLicenses(cmdLine.c_str());
+    if (licenseResult >= 0) return licenseResult;
 #endif
 	return winmain::WinMain(cmdLine.c_str());
 }
@@ -51,7 +50,8 @@ int main(int argc, char* argv[])
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 #if defined(PINBALL_STANDALONE)
-    if (ExportLicenses(lpCmdLine)) return 0;
+    const auto licenseResult = ExportLicenses(lpCmdLine);
+    if (licenseResult >= 0) return licenseResult;
 #endif
 	return winmain::WinMain(lpCmdLine);
 }

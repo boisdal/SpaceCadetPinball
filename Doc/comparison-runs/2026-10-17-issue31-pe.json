@@ -1,7 +1,7 @@
 {
   "file": "SpaceCadetPinball.exe",
-  "bytes": 3723776,
-  "sha256": "19c84582c43eba2a2f368140adfd957f8e377faa304e9743698858420549c27f",
+  "bytes": 4096512,
+  "sha256": "b292dda8eb346ffc4535be436397fa8350dcab9651ed49798ae2880f03fef86a",
   "architecture": "x64",
   "imports": [
     "advapi32.dll",
@@ -11,6 +11,7 @@
     "api-ms-win-crt-heap-l1-1-0.dll",
     "api-ms-win-crt-locale-l1-1-0.dll",
     "api-ms-win-crt-math-l1-1-0.dll",
+    "api-ms-win-crt-multibyte-l1-1-0.dll",
     "api-ms-win-crt-private-l1-1-0.dll",
     "api-ms-win-crt-runtime-l1-1-0.dll",
     "api-ms-win-crt-stdio-l1-1-0.dll",
@@ -29,5 +30,12 @@
     "winmm.dll"
   ],
   "embedded_notices": true,
-  "scope": "Static PE inspection; not a clean-machine interactive test."
+  "scope": "Static PE inspection; not a clean-machine interactive test.",
+  "validation": {
+    "license_export": "exit 0 and bytes match source notices",
+    "existing_license_file": "exit 1 and bytes unchanged",
+    "clean_windows_without_development_tools": "not performed; Windows Sandbox unavailable",
+    "linux_macos_builds": "not performed in this Windows workspace",
+    "display_32": "not included in this candidate; rebuild after integration"
+  }
 }
