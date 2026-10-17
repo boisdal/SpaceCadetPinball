@@ -1,6 +1,7 @@
 #pragma once
 #include "ResourceSha256.h"
 #include "ResourceAudioFingerprints.h"
+#include "ResourceDatValidation.h"
 #include <algorithm>
 #include <cerrno>
 #include <cstring>
@@ -65,6 +66,8 @@ struct ResourceInspection
 {
     bool valid=false;
     bool fullTilt=false;
+    bool knownFingerprint=false;
+    bool needsManualMode=false;
     std::string directory, datName, fingerprint, description;
     std::vector<std::string> errors, warnings, observations;
 };
@@ -76,6 +79,8 @@ class ResourceCatalog
     std::string registryPath;
     bool registryReadable=true;
     std::string directories[2];
+    std::string fingerprints[2];
+    bool manualModes[2]={false,false};
     static void CheckAudio(bool ft, const std::string& relative, const std::vector<unsigned char>& data, ResourceInspection& result)
     {
         auto key=relative;std::transform(key.begin(),key.end(),key.begin(),[](unsigned char c){return std::tolower(c);});
@@ -111,16 +116,61 @@ class ResourceCatalog
 public:
     explicit ResourceCatalog(const std::string& path):registryPath(path){}
     const std::string& Get(bool fullTilt) const {return directories[fullTilt?1:0];}
+    ResourceInspection InspectRegistered(bool fullTilt) const
+    {
+        const int slot=fullTilt?1:0;
+        auto result=Inspect(directories[slot],manualModes[slot]?slot:-1);
+        if(result.valid && ((!fingerprints[slot].empty() && result.fingerprint!=fingerprints[slot]) || result.fullTilt!=fullTilt))
+        {
+            result.valid=false;
+            result.errors.push_back("The registered table changed. Inspect and confirm the folder again.");
+        }
+        return result;
+    }
     bool Load(std::string& error)
     {
         registryReadable=false;
-        FILE* f=ResourceFiles::Open(registryPath,"rb");if(!f){if(errno==ENOENT){registryReadable=true;return true;}error="Cannot read resource registry: "+registryPath;return false;}fclose(f);
+        FILE* f=ResourceFiles::Open(registryPath,"rb");
+        if(!f)
+        {
+            if(errno==ENOENT){registryReadable=true;return true;}
+            error="Cannot read resource registry: "+registryPath;return false;
+        }
+        fclose(f);
         std::vector<unsigned char> bytes;if(!ResourceFiles::Read(registryPath,bytes,error))return false;
-        std::string text(bytes.begin(),bytes.end());if(text.compare(0,21,"PINBALL-RESOURCES-v1\n")!=0){error="Unrecognized resource registry: "+registryPath;return false;}
-        size_t p=21;std::string next[2];for(int i=0;i<2;++i){auto end=text.find('\n',p);if(end==std::string::npos){error="Incomplete resource registry";return false;}next[i]=text.substr(p,end-p);if(!next[i].empty() && !ResourceFiles::Absolute(next[i])){error="Invalid resource path in registry";return false;}p=end+1;}
-        if(p!=text.size()){error="Unexpected resource registry content";return false;}directories[0]=next[0];directories[1]=next[1];registryReadable=true;return true;
+        std::string text(bytes.begin(),bytes.end());
+        const bool version2=text.compare(0,21,"PINBALL-RESOURCES-v2\n")==0;
+        if(!version2 && text.compare(0,21,"PINBALL-RESOURCES-v1\n")!=0)
+        {error="Unrecognized resource registry: "+registryPath;return false;}
+        size_t position=21;std::vector<std::string> lines;
+        while(position<text.size())
+        {
+            auto end=text.find('\n',position);
+            if(end==std::string::npos){error="Incomplete resource registry";return false;}
+            lines.push_back(text.substr(position,end-position));position=end+1;
+        }
+        if(lines.size()!=(version2?6u:2u)){error="Unexpected resource registry content";return false;}
+        for(int slot=0;slot<2;++slot)
+        {
+            if(lines[slot].find_first_of("\r\n")!=std::string::npos || lines[slot].find('\0')!=std::string::npos ||
+               (!lines[slot].empty() && !ResourceFiles::Absolute(lines[slot])))
+            {error="Invalid resource path in registry";return false;}
+            if(version2)
+            {
+                auto hash=lines[2+slot];auto mode=lines[4+slot];
+                if((!hash.empty() && (hash.size()!=64 || hash.find_first_not_of("0123456789abcdef")!=std::string::npos)) ||
+                    (mode!="recognized" && mode!="manual") || (mode=="manual" && hash.empty()))
+                {error="Invalid resource provenance in registry";return false;}
+            }
+        }
+        for(int slot=0;slot<2;++slot)
+        {
+            directories[slot]=lines[slot];fingerprints[slot]=version2?lines[2+slot]:"";
+            manualModes[slot]=version2 && lines[4+slot]=="manual";
+        }
+        registryReadable=true;return true;
     }
-    static ResourceInspection Inspect(const std::string& directory)
+    static ResourceInspection Inspect(const std::string& directory, int manualMode=-1)
     {
         ResourceInspection result;result.directory=directory;
         if(!ResourceFiles::Absolute(directory) || directory.find_first_of("\r\n")!=std::string::npos || directory.find('\0')!=std::string::npos){result.errors.push_back("Enter an absolute folder path, without quotes or line breaks.");return result;}
@@ -132,10 +182,38 @@ public:
             ResourceSha256 digest;digest.add(data.data(),data.size());auto hash=digest.finish();
             bool windows=hash=="42defd5d2a339a3953fe643716aff4e35b2cea7a3e54505c82d1e78d5325bc04";
             bool ft=hash=="d4b85b0cc0cb05e4be49bf4a5a56e65be8514c854c0f718180845cb07f272ee3";
-            if(!windows && !ft){result.errors.push_back(name+": unrecognized table fingerprint. Select an original resource folder matching a documented reference.");continue;}
+            bool recognized=windows || ft;
+            if(!recognized)
+            {
+                std::string windowsError,tiltError;
+                if(manualMode==0 || manualMode==1)
+                {
+                    ft=manualMode==1;
+                    if(!ResourceDatValidation::Validate(data,ft,error))
+                    {result.errors.push_back(name+": "+error);continue;}
+                }
+                else
+                {
+                    bool validWindows=ResourceDatValidation::Validate(data,false,windowsError);
+                    bool validTilt=ResourceDatValidation::Validate(data,true,tiltError);
+                    if(!validWindows && !validTilt)
+                    {
+                        result.errors.push_back(name+": unrecognized table fingerprint; invalid structure. Windows: "+windowsError+". Full Tilt: "+tiltError);
+                        continue;
+                    }
+                    result.needsManualMode=true;
+                }
+            }
             if(found){result.valid=false;result.errors.push_back("Both tables are present. Select a separate folder for each game.");return result;}
-            found=true;result.fullTilt=ft;result.datName=name;result.fingerprint=hash;
+            found=true;result.fullTilt=ft;result.datName=name;result.fingerprint=hash;result.knownFingerprint=recognized;
             result.description=ft?"Full Tilt table recognized (shared Windows 95 / Windows 3.1 data; exact edition unverified)":"Windows table recognized (matches XP reference data; exact edition unverified)";
+            if(!recognized)
+            {
+                result.description=result.needsManualMode?
+                    "Unrecognized table fingerprint. Choose its game mode explicitly; the exact edition and provenance remain unverified.":
+                    std::string("Unrecognized table; ")+(ft?"Full Tilt":"Windows")+" mode confirmed manually. Exact edition and provenance remain unverified.";
+                if(result.needsManualMode)continue;
+            }
             std::set<std::string> sounds;if(!Sounds(data,sounds)){result.errors.push_back(name+": invalid resource structure");return result;}
             for(const auto& sound:sounds)
             {
@@ -144,26 +222,31 @@ public:
                 {
                     auto lower=sound;std::transform(lower.begin(),lower.end(),lower.begin(),[](unsigned char c){return std::tolower(c);});
                     bool referenceAbsence=lower=="sound2.wav" || lower=="sound37.wav" || lower=="sound44.wav" || lower=="sound59.wav" || lower=="sound62.wav" || lower==(ft?"sound111.wav":"sound52.wav");
-                    if(referenceAbsence)result.observations.push_back("Also absent from documented reference: "+file);
+                    if(recognized && referenceAbsence)result.observations.push_back("Also absent from documented reference: "+file);
                     else result.warnings.push_back("Sound unavailable: "+error);
                 }
-                else CheckAudio(ft,(ft?"sound/":"")+sound,content,result);
+                else if(recognized)CheckAudio(ft,(ft?"sound/":"")+sound,content,result);
             }
             std::vector<std::string> tracks=ft?std::vector<std::string>{"SOUND/TABA1","SOUND/TABA2","SOUND/TABA3"}:std::vector<std::string>{"PINBALL"};
-            for(const auto& track:tracks){bool readable=false;for(const auto ext:{".MID",".MDS"}){std::vector<unsigned char> content;if(ResourceFiles::Read(ResourceFiles::Join(directory,ResourceFiles::Existing(directory,track+ext)),content,error)){CheckAudio(ft,track+ext,content,result);readable=true;break;}}if(!readable)result.warnings.push_back("Music unavailable: "+track+".MID or .MDS");}
+            for(const auto& track:tracks){bool readable=false;for(const auto ext:{".MID",".MDS"}){std::vector<unsigned char> content;if(ResourceFiles::Read(ResourceFiles::Join(directory,ResourceFiles::Existing(directory,track+ext)),content,error)){if(recognized)CheckAudio(ft,track+ext,content,result);readable=true;break;}}if(!readable)result.warnings.push_back("Music unavailable: "+track+".MID or .MDS");}
         }
-        if(found){result.errors.clear();result.valid=true;}return result;
+        if(found){result.errors.clear();result.valid=!result.needsManualMode;}return result;
     }
     bool Register(const ResourceInspection& inspected, std::string& error)
     {
         // Revalidate at commit time: failed import must leave both previous entries intact.
         if(!registryReadable && !Load(error))return false;
-        auto current=Inspect(inspected.directory);if(!current.valid || current.fullTilt!=inspected.fullTilt || current.fingerprint!=inspected.fingerprint){error="Resources changed or are invalid. Inspect the folder again.";return false;}
+        auto current=Inspect(inspected.directory,inspected.knownFingerprint?-1:(inspected.fullTilt?1:0));if(!inspected.valid || !current.valid || current.fullTilt!=inspected.fullTilt || current.fingerprint!=inspected.fingerprint){error="Resources changed or are invalid. Inspect the folder again.";return false;}
         std::string next[2]={directories[0],directories[1]};next[current.fullTilt?1:0]=current.directory;
+        std::string nextFingerprints[2]={fingerprints[0],fingerprints[1]};
+        bool nextManual[2]={manualModes[0],manualModes[1]};
+        nextFingerprints[current.fullTilt?1:0]=current.fingerprint;nextManual[current.fullTilt?1:0]=!current.knownFingerprint;
         auto temporary=registryPath+".tmp";FILE* f=ResourceFiles::Open(temporary,"wb");if(!f){error="Cannot save resource configuration: "+registryPath;return false;}
-        auto text=std::string("PINBALL-RESOURCES-v1\n")+next[0]+"\n"+next[1]+"\n";
+        auto text=std::string("PINBALL-RESOURCES-v2\n")+next[0]+"\n"+next[1]+"\n"+
+            nextFingerprints[0]+"\n"+nextFingerprints[1]+"\n"+(nextManual[0]?"manual":"recognized")+"\n"+(nextManual[1]?"manual":"recognized")+"\n";
         bool ok=fwrite(text.data(),1,text.size(),f)==text.size();if(fflush(f)!=0)ok=false;if(fclose(f)!=0)ok=false;
         if(!ok || !ResourceFiles::Replace(temporary,registryPath)){error="Cannot replace resource configuration; previous imports retained.";return false;}
-        directories[0]=next[0];directories[1]=next[1];registryReadable=true;return true;
+        for(int slot=0;slot<2;++slot){directories[slot]=next[slot];fingerprints[slot]=nextFingerprints[slot];manualModes[slot]=nextManual[slot];}
+        registryReadable=true;return true;
     }
 };

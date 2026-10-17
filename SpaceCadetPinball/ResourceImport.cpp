@@ -27,10 +27,16 @@ void DrawDialog(bool initial)
         if(ImGui::InputText("##resource-folder",folder,sizeof folder))inspected=ResourceInspection{};
         if(ImGui::Button("Inspect folder")) {inspected=ResourceCatalog::Inspect(folder);diagnostic.clear();}
         ImGui::SameLine();
-        if(ImGui::Button(initial?"Cancel and quit":"Cancel"))showImport=false;
+        if(ImGui::Button(initial?"Back":"Cancel"))showImport=false;
         if(!diagnostic.empty())ImGui::TextWrapped("%s",diagnostic.c_str());
         if(!inspected.description.empty())ImGui::TextWrapped("%s",inspected.description.c_str());
         for(const auto& error:inspected.errors)ImGui::TextWrapped("%s",error.c_str());
+        if(inspected.needsManualMode)
+        {
+            if(ImGui::Button("Confirm Windows mode"))inspected=ResourceCatalog::Inspect(folder,0);
+            ImGui::SameLine();
+            if(ImGui::Button("Confirm Full Tilt mode"))inspected=ResourceCatalog::Inspect(folder,1);
+        }
         if(inspected.valid)
         {
             if(!inspected.warnings.empty())ImGui::TextWrapped("Some audio files are missing or unreadable. You can continue without those sounds, or fix the folder and inspect again.");
@@ -65,7 +71,7 @@ bool ResourceImport::SelectPreferred(bool preferWindows)
 {
     bool mode=!preferWindows;
     if(catalog->Get(mode).empty())return false;
-    auto data=ResourceCatalog::Inspect(catalog->Get(mode));
+    auto data=catalog->InspectRegistered(mode);
     if(!data.valid || data.fullTilt!=mode)
     {
         diagnostic="The configured folder is unavailable or changed. Restore it or import a replacement.\n";

@@ -81,6 +81,7 @@ set(SOURCE_FILES
         SpaceCadetPinball/ResourceImport.cpp
         SpaceCadetPinball/ResourceImport.h
         SpaceCadetPinball/ResourceCatalog.h
+        SpaceCadetPinball/ResourceDatValidation.h
         SpaceCadetPinball/ResourceAudioFingerprints.h
         SpaceCadetPinball/ResourceSha256.h
         SpaceCadetPinball/render.cpp
