@@ -125,6 +125,9 @@ optionsStruct options::Options
 	{"FullScreen", false},
 	{"Players", 1},
 	{"Screen Resolution", -1},
+	{"Window Width", 0},
+	{"Window Height", 0},
+	{"Window Maximized", false},
 	{"UI Scale", 1.0f},
 	{"Uniform scaling", true},
 	{"Linear Filtering", true},
@@ -180,9 +183,7 @@ void options::InitPrimary()
 void options::InitSecondary()
 {
 	auto maxRes = fullscrn::GetMaxResolution();
-	if (Options.Resolution >= 0 && Options.Resolution > maxRes)
-		Options.Resolution = maxRes;
-	fullscrn::SetResolution(Options.Resolution == -1 ? maxRes : Options.Resolution);
+	fullscrn::SetResolution(Options.Resolution < 0 ? maxRes : std::min(Options.Resolution.V, maxRes));
 }
 
 void options::uninit()
@@ -345,7 +346,8 @@ void options::RenderControlDialog()
 	if (!ShowDialog)
 		return;
 
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2{550, 550});
+	winmain::ConstrainNextDialog(650,550);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2{1, 1});
 	if (ImGui::Begin(pb::get_rc_string(Msg::KEYMAPPER_Caption), &ShowDialog))
 	{
 		if (ImGui::TreeNode(pb::get_rc_string(Msg::KEYMAPPER_Groupbox2)))
@@ -494,7 +496,7 @@ void options::MyUserData_WriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handl
 
 void options::PostProcessOptions()
 {
-	winmain::ImIO->FontGlobalScale = Options.UIScale;
+	Options.UIScale.V = std::isfinite(Options.UIScale.V) ? Clamp(Options.UIScale.V, 0.8f, 3.0f) : 1.0f;
 	Options.FramesPerSecond = Clamp(Options.FramesPerSecond.V, MinFps, MaxFps);
 	Options.UpdatesPerSecond = Clamp(Options.UpdatesPerSecond.V, MinUps, MaxUps);
 	Options.SoundChannels = Clamp(Options.SoundChannels.V, MinSoundChannels, MaxSoundChannels);

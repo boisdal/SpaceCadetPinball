@@ -1,0 +1,44 @@
+name: Windows standalone
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'SpaceCadetPinball/**'
+      - 'CMakeLists.txt'
+      - 'CMakeModules/**'
+      - 'Platform/Windows/**'
+      - 'tools/*windows*'
+      - '.github/workflows/windows-standalone.yml'
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned build tools
+        run: python -m pip install ziglang==0.13.0 cmake==3.31.6 ninja==1.11.1.4
+      - name: Build one executable
+        shell: pwsh
+        run: |
+          $zig = python -c "import pathlib,ziglang;print(pathlib.Path(ziglang.__file__).parent/'zig.exe')"
+          $cmake = python -c "import cmake;print(cmake.CMAKE_BIN_DIR+'/cmake.exe')"
+          ./tools/build_windows_release.ps1 -Zig $zig -CMake $cmake -Ninja (Get-Command ninja).Source -BuildDirectory "$env:RUNNER_TEMP/pinball-build" -OutputDirectory "$env:RUNNER_TEMP/pinball-release"
+      - name: Audit imports and embedded notices
+        shell: pwsh
+        run: |
+          python tools/check_windows_release.py "$env:RUNNER_TEMP/pinball-release/SpaceCadetPinball.exe"
+          Push-Location "$env:RUNNER_TEMP/pinball-build"
+          $p = Start-Process "$env:RUNNER_TEMP/pinball-release/SpaceCadetPinball.exe" -ArgumentList '--licenses' -Wait -PassThru -WindowStyle Hidden
+          if ($p.ExitCode -ne 0) { throw 'License extraction failed.' }
+          $actual = (Get-FileHash SpaceCadetPinball-LICENSES.txt).Hash
+          $expected = (Get-FileHash "$env:GITHUB_WORKSPACE/Platform/Windows/THIRD-PARTY-NOTICES.txt").Hash
+          if ($actual -ne $expected) { throw 'Embedded notices differ.' }
+          Pop-Location
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SpaceCadetPinball-Windows-x64
+          path: ${{ runner.temp }}/pinball-release/SpaceCadetPinball.exe
+          if-no-files-found: error

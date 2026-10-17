@@ -1,0 +1,43 @@
+{
+  "file": "SpaceCadetPinball.exe",
+  "bytes": 4099584,
+  "sha256": "c88bc2737fcf1ea0b90c7cf07defba547f4144ca60bc8f41573cf8fa5730e5f7",
+  "architecture": "x64",
+  "imports": [
+    "advapi32.dll",
+    "api-ms-win-crt-convert-l1-1-0.dll",
+    "api-ms-win-crt-environment-l1-1-0.dll",
+    "api-ms-win-crt-filesystem-l1-1-0.dll",
+    "api-ms-win-crt-heap-l1-1-0.dll",
+    "api-ms-win-crt-locale-l1-1-0.dll",
+    "api-ms-win-crt-math-l1-1-0.dll",
+    "api-ms-win-crt-multibyte-l1-1-0.dll",
+    "api-ms-win-crt-private-l1-1-0.dll",
+    "api-ms-win-crt-runtime-l1-1-0.dll",
+    "api-ms-win-crt-stdio-l1-1-0.dll",
+    "api-ms-win-crt-string-l1-1-0.dll",
+    "api-ms-win-crt-time-l1-1-0.dll",
+    "api-ms-win-crt-utility-l1-1-0.dll",
+    "gdi32.dll",
+    "imm32.dll",
+    "kernel32.dll",
+    "ole32.dll",
+    "oleaut32.dll",
+    "setupapi.dll",
+    "shell32.dll",
+    "user32.dll",
+    "version.dll",
+    "winmm.dll"
+  ],
+  "embedded_notices": true,
+  "audit_instrumentation": false,
+  "scope": "Static PE inspection; not a clean-machine interactive test.",
+  "validation": {
+    "source_integration": "04c998d (includes font fix 68ff1b4)",
+    "license_export": "exit 0 and bytes match source notices",
+    "existing_license_file": "exit 1 and bytes unchanged",
+    "clean_windows_without_development_tools": "not performed; Windows Sandbox unavailable",
+    "linux_macos_builds": "not performed in this Windows workspace",
+    "interactive": "root agent validates separately"
+  }
+}

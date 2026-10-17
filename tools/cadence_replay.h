@@ -4,10 +4,14 @@
 #include "../SpaceCadetPinball/TBall.h"
 #include "../SpaceCadetPinball/TFlipper.h"
 #include "../SpaceCadetPinball/TFlipperEdge.h"
+#include "mission_replay_audit.h"
+#include "multiball_replay.h"
 #include "../SpaceCadetPinball/TPlunger.h"
 
 class CadenceReplay
 {
+    MissionReplayAudit missionReplay;
+    MultiballReplay multiball;
     struct Sample { double time; float x, y, z, speed, left, right; int score, active, balls; };
     std::vector<Sample> samples;
     std::chrono::steady_clock::time_point created = std::chrono::steady_clock::now();
@@ -65,6 +69,8 @@ public:
     void BeforeStep()
     {
         if (!Enabled) return;
+        if (multiball.Enabled) { multiball.BeforeStep(simulated); return; }
+        if (missionReplay.Enabled) { missionReplay.BeforeStep(simulated); return; }
         if (physicsScenario)
         {
             auto plunger = pb::MainTable->Plunger;
@@ -112,6 +118,7 @@ public:
     {
         if (!Enabled) return;
         simulated += dt;
+        multiball.AfterStep(simulated);
         auto table = pb::MainTable;
         auto ball = table->BallList.front();
         if (physicsScenario) physicsSamples.push_back({simulated, ball->Direction.X, ball->Direction.Y,
@@ -141,6 +148,7 @@ public:
     void Save()
     {
         if (!Enabled) return;
+        multiball.Validate();
         auto path = std::getenv("PINBALL_CADENCE_CSV");
         if (!path) return;
         auto file = std::fopen((std::string(path) + ".trajectory.csv").c_str(), "w");

@@ -1,3 +1,8 @@
+#ifdef _WIN32
+#define NOMINMAX
+#include <windows.h>
+#include <SDL_syswm.h>
+#endif
 #include "pch.h"
 #include "winmain.h"
 
@@ -12,6 +17,8 @@
 #include "translations.h"
 #include "font_selection.h"
 #include "FrameScheduler.h"
+#include "ResourceImport.h"
+#include "ModeSelection.h"
 #ifdef PINBALL_CADENCE_AUDIT
 #include "../tools/cadence_probe.h"
 #include "../tools/cadence_replay.h"
@@ -55,6 +62,83 @@ optionsStruct& winmain::Options = options::Options;
 winmain::DurationMs winmain::SpinThreshold = DurationMs(0.005);
 WelfordState winmain::SleepState{};
 int winmain::CursorIdleCounter = 0;
+namespace { float WindowDpiScale = 1.0f; }
+
+void winmain::ConstrainNextDialog(float width, float height)
+{
+	const auto available = ImGui::GetIO().DisplaySize;
+	const float margin = 8.0f;
+	const ImVec2 maximum(std::max(1.0f, available.x - margin * 2), std::max(1.0f, available.y - margin * 2));
+	const float scale = ImGui::GetFontSize() / 13.0f;
+	ImGui::SetNextWindowSize(ImVec2(std::min(width * scale, maximum.x), std::min(height * scale, maximum.y)), ImGuiCond_Appearing);
+	ImGui::SetNextWindowSizeConstraints(ImVec2(std::min(240.0f, maximum.x), std::min(160.0f, maximum.y)), maximum);
+	ImGui::SetNextWindowPos(ImVec2(available.x * 0.5f, available.y * 0.5f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+}
+
+void winmain::UpdateUiScale(bool rendererReady)
+{
+	float dpi = 96.0f;
+#ifdef _WIN32
+	// SDL_GetDisplayDPI reports physical density on Windows, not the selected
+	// accessibility scale. GetDpiForWindow returns the effective per-monitor DPI.
+	SDL_SysWMinfo info{};
+	SDL_VERSION(&info.version);
+	using GetWindowDpi = UINT(WINAPI*)(HWND);
+	static auto getWindowDpi = reinterpret_cast<GetWindowDpi>(GetProcAddress(GetModuleHandleW(L"user32.dll"), "GetDpiForWindow"));
+	if (getWindowDpi && SDL_GetWindowWMInfo(MainWindow, &info))
+		dpi = static_cast<float>(getWindowDpi(info.info.win.window));
+#else
+	SDL_GetDisplayDPI(SDL_GetWindowDisplayIndex(MainWindow), nullptr, &dpi, nullptr);
+#endif
+	if (!std::isfinite(dpi) || dpi <= 0) dpi = 96.0f;
+	WindowDpiScale = Clamp(dpi / 96.0f, 1.0f, 4.0f);
+	const float pixels = std::round(13.0f * WindowDpiScale * Options.UIScale.V);
+	if (!rendererReady || ImIO->Fonts->Fonts.empty() || ImIO->Fonts->Fonts[0]->FontSize != pixels)
+	{
+		// Rasterize at the actual display size. Downsampling a 26px pixel-snapped
+		// default font to 13px loses strokes even with a bilinear atlas texture.
+		if (rendererReady) ImGui_Render_Shutdown();
+		ImIO->Fonts->Clear();
+		ImFontConfig fontConfig{};
+		fontConfig.SizePixels = pixels;
+		ImVector<ImWchar> ranges;
+		translations::GetGlyphRange(&ranges);
+		bool loaded = false;
+		if (!Options.FontFileName.V.empty())
+		{
+			if (auto file = fopenu(Options.FontFileName.V.c_str(), "rb"))
+			{
+				fclose(file);
+				loaded = ImIO->Fonts->AddFontFromFileTTF(Options.FontFileName.V.c_str(), pixels, &fontConfig, ranges.Data) != nullptr;
+			}
+		}
+		if (!loaded) ImIO->Fonts->AddFontDefault(&fontConfig);
+		ImIO->Fonts->Build();
+		ImIO->FontDefault = nullptr;
+		ImIO->FontGlobalScale = 1.0f;
+		ImGui::GetStyle() = ImGuiStyle();
+		ImGui::StyleColorsDark();
+		ImGui::GetStyle().ScaleAllSizes(pixels / 13.0f);
+		if (rendererReady) ImGui_Render_Init(Renderer);
+		int width, height, renderWidth, renderHeight;
+		SDL_GetWindowSize(MainWindow, &width, &height);
+		SDL_GetRendererOutputSize(Renderer, &renderWidth, &renderHeight);
+		printf("Display: effective DPI %.0f; font %.0fpx; window %dx%d; renderer %dx%d\n", dpi, pixels, width, height, renderWidth, renderHeight);
+	}
+}
+
+void winmain::SetWindowSize(int width, int height)
+{
+	SDL_Rect bounds{};
+	if (SDL_GetDisplayUsableBounds(SDL_GetWindowDisplayIndex(MainWindow), &bounds) == 0)
+	{
+		// Leave room for the title bar and borders, including on a smaller monitor.
+		width = std::min(width, std::max(320, bounds.w - 64));
+		height = std::min(height, std::max(240, bounds.h - 96));
+	}
+	SDL_SetWindowSize(MainWindow, std::max(320, width), std::max(240, height));
+	SDL_SetWindowPosition(MainWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+}
 
 int winmain::WinMain(LPCSTR lpCmdLine)
 {
@@ -66,6 +150,10 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 	printf(" SDL_mixer %d.%d.%d;", SDL_MIXER_MAJOR_VERSION, SDL_MIXER_MINOR_VERSION, SDL_MIXER_PATCHLEVEL);
 	printf(" ImGui %s %s\n", IMGUI_VERSION, ImGuiRender);
 
+	// Keep renderer, mouse and window coordinates in physical pixels on Windows.
+#ifdef SDL_HINT_WINDOWS_DPI_AWARENESS
+	SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2");
+#endif
 	// SDL init
 	SDL_SetMainReady();
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO |
@@ -117,6 +205,7 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 
 	auto prefPath = SDL_GetPrefPath("", "SpaceCadetPinball");
 	auto basePath = SDL_GetBasePath();
+	ResourceImport::Initialize(prefPath ? prefPath : "");
 
 	// SDL mixer init
 	bool mixOpened = false, noAudio = strstr(lpCmdLine, "-noaudio") != nullptr;
@@ -177,35 +266,8 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 			options::ResetAllOptions();
 		}
 
-		if (!Options.FontFileName.V.empty())
-		{
-			ImVector<ImWchar> ranges;
-			translations::GetGlyphRange(&ranges);
-			ImFontConfig fontConfig{};
-
-			// ToDo: further tweak font options, maybe try imgui_freetype
-			fontConfig.OversampleV = 2;
-			fontConfig.OversampleH = 4;
-
-			// ToDo: improve font file test, checking if file exists is not enough
-			auto fontLoaded = false;
-			auto fileName = Options.FontFileName.V.c_str();
-			auto fileHandle = fopenu(fileName, "rb");
-			if (fileHandle)
-			{
-				fclose(fileHandle);
-
-				// ToDo: Bind font size to UI scale
-				if (io.Fonts->AddFontFromFileTTF(fileName, 13.f, &fontConfig, ranges.Data))
-					fontLoaded = true;
-			}
-
-			if (!fontLoaded)
-				printf("Failed to load font: %s, using embedded font.\n", fileName);
-			io.Fonts->Build();
-		}
+		UpdateUiScale(false);
 		ImGui_Render_Init(renderer);
-		ImGui::StyleColorsDark();
 
 		ImGui_ImplSDL2_InitForSDLRenderer(window, Renderer);
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
@@ -220,7 +282,13 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 			}
 		};
 		searchPaths.insert(searchPaths.end(), std::begin(PlatformDataPaths), std::end(PlatformDataPaths));
-		pb::SelectDatFile(searchPaths);
+        if (!ModeSelection::Prepare(searchPaths))
+        {
+            ImGui_Render_Shutdown();
+            ImGui_ImplSDL2_Shutdown();
+            ImGui::DestroyContext();
+            break;
+        }
 
 		// Second step: run updates that depend on .DAT file selection
 		options::InitSecondary();
@@ -257,11 +325,11 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 			Options.FullScreen = true;
 		}
 
-		if (!Options.FullScreen)
-		{
-			auto resInfo = &fullscrn::resolution_array[fullscrn::GetResolution()];
-			SDL_SetWindowSize(MainWindow, resInfo->TableWidth, resInfo->TableHeight);
-		}
+		auto resInfo = &fullscrn::resolution_array[fullscrn::GetResolution()];
+		SetWindowSize(Options.WindowWidth > 0 ? Options.WindowWidth.V : int(resInfo->TableWidth * WindowDpiScale),
+			Options.WindowHeight > 0 ? Options.WindowHeight.V : int((resInfo->TableHeight + 32) * WindowDpiScale));
+		if (Options.WindowMaximized && !Options.FullScreen) SDL_MaximizeWindow(MainWindow);
+		SDL_SetWindowTitle(MainWindow, ModeSelection::WindowTitle());
 		SDL_ShowWindow(window);
 		fullscrn::set_screen_mode(Options.FullScreen);
 
@@ -322,7 +390,7 @@ void winmain::MainLoop()
 				auto elapsedSec = DurationMs(curTime - prevTime).count() * 0.001;
 				snprintf(buf, sizeof buf, "Updates/sec = %02.02f Frames/sec = %02.02f ",
 				         updateCounter / elapsedSec, frameCounter / elapsedSec);
-				SDL_SetWindowTitle(MainWindow, buf);
+				SDL_SetWindowTitle(MainWindow, (std::string(ModeSelection::WindowTitle()) + " - " + buf).c_str());
 				FpsDetails = buf;
 				frameCounter = updateCounter = 0;
 				prevTime = curTime;
@@ -423,6 +491,7 @@ void winmain::MainLoop()
 #endif
 				if (Options.HideCursor && CursorIdleCounter <= 0)
 					ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+				UpdateUiScale();
 				ImGui_ImplSDL2_NewFrame();
 				ImGui_Render_NewFrame();
 				ImGui::NewFrame();
@@ -500,6 +569,8 @@ void winmain::MainLoop()
 
 void winmain::RenderUi()
 {
+	ResourceImport::Draw();
+	ModeSelection::DrawConfirmation();
 	// Transparent menu bar with a button for preventing menu lockout.
 	ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4{});
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{});
@@ -639,6 +710,22 @@ void winmain::RenderUi()
 
 			if (ImGui::BeginMenu("Graphics"))
 			{
+				if (ImGui::BeginMenu("Window size"))
+				{
+					const int widths[] = {800, 1280, 1920, 2560};
+					for (int width : widths)
+					{
+						char label[40]; snprintf(label, sizeof(label), "%d pixels wide", width);
+						if (ImGui::MenuItem(label))
+						{
+							Options.FullScreen = false; fullscrn::set_screen_mode(0);
+							Options.WindowMaximized = false; SDL_RestoreWindow(MainWindow);
+							auto& res = fullscrn::resolution_array[fullscrn::GetResolution()];
+							SetWindowSize(width, width * res.TableHeight / res.TableWidth + MainMenuHeight);
+						}
+					}
+					ImGui::EndMenu();
+				}
 				if (ImGui::MenuItem(pb::get_rc_string(Msg::Menu1_WindowUniformScale), nullptr, Options.UniformScaling))
 				{
 					options::toggle(Menu1::WindowUniformScale);
@@ -651,11 +738,8 @@ void winmain::RenderUi()
 				{
 					options::toggle(Menu1::WindowIntegerScale);
 				}
-				if (ImGui::DragFloat("UI Scale", &Options.UIScale.V, 0.005f, 0.8f, 5,
-				                     "%.2f", ImGuiSliderFlags_AlwaysClamp))
-				{
-					ImIO->FontGlobalScale = Options.UIScale;
-				}
+				ImGui::DragFloat("UI Scale", &Options.UIScale.V, 0.005f, 0.8f, 3,
+				                     "%.2f", ImGuiSliderFlags_AlwaysClamp);
 				ImGui::Separator();
 
 				char buffer[80]{};
@@ -739,10 +823,12 @@ void winmain::RenderUi()
 
 			if (ImGui::BeginMenu("Game Data"))
 			{
-				if (ImGui::MenuItem("Prefer 3DPB Data", nullptr, Options.Prefer3DPBGameData))
-				{
-					options::toggle(Menu1::Prefer3DPBGameData);
-				}
+                if (ImGui::MenuItem("Import resource folder..."))
+                {
+                    pause(false);
+                    ResourceImport::Open();
+                }
+                ModeSelection::DrawMenu();
 				ImGui::EndMenu();
 			}
 			ImGui::Separator();
@@ -975,7 +1061,7 @@ int winmain::event_handler(const SDL_Event* event)
 			}
 			break;
 		case SDLK_y:
-			SDL_SetWindowTitle(MainWindow, "Pinball");
+			SDL_SetWindowTitle(MainWindow, ModeSelection::WindowTitle());
 			DispFrameRate ^= true;
 			break;
 		case SDLK_F1:
@@ -1050,15 +1136,24 @@ int winmain::event_handler(const SDL_Event* event)
 		case SDL_WINDOWEVENT_FOCUS_LOST:
 		case SDL_WINDOWEVENT_HIDDEN:
 			activated = false;
-			fullscrn::activate(0);
-			Options.FullScreen = false;
+			// Desktop fullscreen remains selected when switching to another app.
 			Sound::Deactivate();
 			midi::music_stop();
 			has_focus = false;
 			pb::loose_focus();
 			break;
+		case SDL_WINDOWEVENT_MAXIMIZED:
+			Options.WindowMaximized = true;
+			break;
+		case SDL_WINDOWEVENT_RESTORED:
+			Options.WindowMaximized = false;
+			break;
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
 		case SDL_WINDOWEVENT_RESIZED:
+			if (!(SDL_GetWindowFlags(MainWindow) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_MINIMIZED)))
+			{
+				SDL_GetWindowSize(MainWindow, &Options.WindowWidth.V, &Options.WindowHeight.V);
+			}
 			fullscrn::window_size_changed();
 			break;
 		default: ;

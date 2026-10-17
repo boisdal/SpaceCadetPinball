@@ -1,6 +1,31 @@
 #include "pch.h"
 #include "winmain.h"
 
+#if defined(_WIN32) && defined(PINBALL_STANDALONE)
+#include <windows.h>
+
+// The release is one file. Its notices remain available without game resources.
+static int ExportLicenses(const char* commandLine)
+{
+    if (strcmp(commandLine, "--licenses") != 0)
+        return -1;
+    auto module = GetModuleHandleW(nullptr);
+    auto resource = FindResourceW(module, MAKEINTRESOURCEW(101), MAKEINTRESOURCEW(10));
+    auto data = resource ? LoadResource(module, resource) : nullptr;
+    auto bytes = data ? LockResource(data) : nullptr;
+    auto length = resource ? SizeofResource(module, resource) : 0;
+    // CREATE_NEW deliberately preserves any existing local document.
+    auto file = CreateFileW(L"SpaceCadetPinball-LICENSES.txt", GENERIC_WRITE, 0,
+        nullptr, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
+    DWORD written = 0;
+    bool success = file != INVALID_HANDLE_VALUE && bytes &&
+        WriteFile(file, bytes, length, &written, nullptr) && written == length;
+    if (file != INVALID_HANDLE_VALUE)
+        CloseHandle(file);
+    return success ? 0 : 1;
+}
+#endif
+
 int main(int argc, char* argv[])
 {
 	std::string cmdLine;
@@ -11,6 +36,10 @@ int main(int argc, char* argv[])
 		cmdLine += argv[i];
 	}
 
+#if defined(_WIN32) && defined(PINBALL_STANDALONE)
+    const auto licenseResult = ExportLicenses(cmdLine.c_str());
+    if (licenseResult >= 0) return licenseResult;
+#endif
 	return winmain::WinMain(cmdLine.c_str());
 }
 
@@ -20,6 +49,10 @@ int main(int argc, char* argv[])
 // Windows subsystem main
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+#if defined(PINBALL_STANDALONE)
+    const auto licenseResult = ExportLicenses(lpCmdLine);
+    if (licenseResult >= 0) return licenseResult;
+#endif
 	return winmain::WinMain(lpCmdLine);
 }
 

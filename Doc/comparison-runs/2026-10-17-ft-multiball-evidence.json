@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "reference_sha1": "3f7b5699074b83fd713657cd94671f2156dbedc4",
+  "reference_sha256": "b82e1f15d70f812d008453d3e44c2bde28fc1105056de99e51dea38e05cf3dc4",
+  "method": "static instruction checks, interpreted with control.cpp",
+  "checks": [
+    {
+      "address": "0x422d32",
+      "interpretation": "Multiball launch gate: count <= 1",
+      "verified": true
+    },
+    {
+      "address": "0x422d3b",
+      "interpretation": "Schedule three additional balls",
+      "verified": true
+    },
+    {
+      "address": "0x422f42",
+      "interpretation": "Lock gate: count <= 1",
+      "verified": true
+    },
+    {
+      "address": "0x422f4b",
+      "interpretation": "Captured ball removed from active count",
+      "verified": true
+    },
+    {
+      "address": "0x422f5e",
+      "interpretation": "Third lock checks two previous locks",
+      "verified": true
+    },
+    {
+      "address": "0x422f63",
+      "interpretation": "Clear lock count for multiball",
+      "verified": true
+    },
+    {
+      "address": "0x422f7b",
+      "interpretation": "Multiball delay: float 2.0 seconds",
+      "verified": true
+    },
+    {
+      "address": "0x422f80",
+      "interpretation": "Invoke multiball launch routine",
+      "verified": true
+    },
+    {
+      "address": "0x422f86",
+      "interpretation": "First/second lock increment",
+      "verified": true
+    },
+    {
+      "address": "0x422f9b",
+      "interpretation": "Replacement delay: float 2.0 seconds",
+      "verified": true
+    },
+    {
+      "address": "0x422fa6",
+      "interpretation": "Replacement plunger message 1019",
+      "verified": true
+    }
+  ],
+  "limitations": [
+    "No execution of the historical game.",
+    "Does not establish physical ejection timing, trajectories or complete drain behavior.",
+    "Names are inferred from source/control structure, not original debug symbols."
+  ]
+}
