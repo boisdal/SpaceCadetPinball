@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-17",
+  "issue": 30,
+  "method": "Native Windows UI through computer-use sky; isolated audit preferences and registry",
+  "binary_sha256": "f111cddc9d8bc40e958211446e913c1d0642dd27d61992331cff0320b2fe8f8e",
+  "binary_local_relative_path": "audit/issue31/final-audit/SpaceCadetPinball.exe",
+  "fixture": {
+    "source_reference": "windows-xp-x86-en",
+    "source_dat_sha256_unchanged": "42defd5d2a339a3953fe643716aff4e35b2cea7a3e54505c82d1e78d5325bc04",
+    "mutation": "Copy only PINBALL.DAT, change description byte at offset71 to ASCII V. Original reference untouched.",
+    "dat_sha256": "3388c5289223637e4e95b0fc50c43869325885be78f9621d914e8767ae87d1ac",
+    "audio": "No WAV or music copied; named warnings expected."
+  },
+  "observations": [
+    "Empty folder inspection names PINBALL.DAT and CADET.DAT as missing; no import is committed.",
+    "Correcting the path and inspecting the mutated DAT shows Unrecognized table fingerprint, explicit Windows/Full Tilt buttons, and exact edition/provenance remain unverified.",
+    "Confirm Windows mode changes description to manually confirmed Windows while retaining unknown edition/provenance.",
+    "Remember folder with audio warnings succeeds; Windows becomes available in the chooser, Full Tilt remains unavailable.",
+    "Selecting Windows loads the table with title Pinball - Windows despite absent optional audio.",
+    "Closing via titlebar X persists Selected historical mode=windows, the fixture fingerprint, and manual provenance in registry v2.",
+    "Fresh process with the same isolated files loads Windows directly without repeating mode confirmation.",
+    "Both processes closed normally through the titlebar X; no reference file modified."
+  ],
+  "local_evidence_relative_to_audit_issue30_ui": {
+    "unknown-ui-empty-diagnostic.jpg": "7a9ec2059cf668f25ec999260089fd1eb69e8d232a964befce3d40d5f4aabe7b",
+    "unknown-ui-loaded.jpg": "76bb5b819d95b7422f2354c1f7ac654905f8c97f9cdc77291aedc08b04d3dcbc",
+    "unknown-ui-manual-choice.jpg": "2fedffd5b3c778e60fd06b65e9b2d7173b2073040798419b2df5400b962cf8b9",
+    "unknown-ui-manual-confirmed.jpg": "64cfabbb002f7dcf7b7aa02e64c8b1f2b51796d537cc0955b0bc9e439bb41872",
+    "unknown-ui-restarted.jpg": "351387a694bc5d612cb691bd31d5b8d800db59d86c006a803329e20a4b8f5d1d"
+  },
+  "screenshots_published": false,
+  "limitations": "This verifies import UI, mode persistence and successful table initialization. It does not claim historical authenticity or physics equivalence of arbitrary unknown variants."
+}
