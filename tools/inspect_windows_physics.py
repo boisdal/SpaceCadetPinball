@@ -13,7 +13,7 @@ import struct
 EXPECTED_SHA256 = '2bbc8234685fe2f6324040af6ea20123cf00c4a56882ce0d9074f0beefac67bc'
 
 
-def inspect(path):
+def load_xp_reader(path):
     data = path.read_bytes()
     digest = hashlib.sha256(data).hexdigest()
     if digest != EXPECTED_SHA256:
@@ -30,6 +30,12 @@ def inspect(path):
             if start <= rva and rva + size <= start + raw_size:
                 return data[raw + rva - start:raw + rva - start + size]
         raise ValueError('Unmapped address')
+
+    return read, digest
+
+
+def inspect(path):
+    read, digest = load_xp_reader(path)
 
     def unpack(fmt, va):
         return struct.unpack(fmt, read(va, struct.calcsize(fmt)))[0]
