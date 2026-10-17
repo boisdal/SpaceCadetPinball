@@ -32,6 +32,30 @@ Il vérifie les écritures/lectures successives de deux profils, l'archive héri
 en lecture seule, l'effacement isolé, les espaces démo/custom, les réglages
 invalides et les scores élevés. Avec Zig, remplacer `c++` par `zig c++`.
 
+## Vérification de la persistance réelle
+
+`tests/high_score_integration_test.cpp` lie le code réel du jeu, des options et
+d'ImGui. Il utilise un fichier synthétique unique, sans ressources propriétaires
+ni fenêtre. Le script Windows compile avec les assertions actives et exécute
+trois processus successifs :
+
+```powershell
+./tests/run_high_score_integration.ps1 -Zig <zig.exe> -Sdl <SDL2> -Mixer <SDL2_mixer> -OutputDirectory <sortie>
+```
+
+Le premier processus inscrit Windows à 1 000 000 et Full Tilt à 2 000 000,
+alterne les profils puis détruit/recrée le contexte ImGui, comme lors d'un
+redémarrage interne. Le deuxième relit les scores et efface seulement Windows.
+Le troisième vérifie Windows vide et Full Tilt intact. Les trois vérifient
+le record hérité non attribué à 3 000 000. L'enregistrement disque est déclenché
+par la destruction normale du contexte, après `options::uninit()` et
+`high_score::write()`, sans écriture de fichier simulée. La saisie et l'effacement
+du tableau sont faits directement ; ce test ne prétend pas cliquer les dialogues.
+
+Exécuté le 17 octobre 2026 avec Zig 0.13.0, SDL 2.30.11 et SDL_mixer 2.8.0 :
+les trois étapes et le test unitaire passent. La compilation complète du jeu
+avec le script `tools/build_comparison_windows.ps1` réussit également.
+
 La vérification interactive complémentaire consiste à saisir un record dans
 chaque mode, quitter normalement et relancer ; consulter les records hérités,
 puis effacer un tableau courant et vérifier que l'autre tableau et l'archive
