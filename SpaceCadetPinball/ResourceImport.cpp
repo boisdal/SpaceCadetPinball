@@ -15,7 +15,7 @@ std::string diagnostic;
 
 void DrawDialog(bool initial)
 {
-    ImGui::SetNextWindowSize(ImVec2(700,480),ImGuiCond_FirstUseEver);
+    winmain::ConstrainNextDialog(700,480);
     if(ImGui::Begin(initial?"Configure game resources":"Import game resources",initial?nullptr:&showImport))
     {
         ImGui::TextWrapped("Choose the folder containing PINBALL.DAT (Windows) or CADET.DAT (Full Tilt). Paste its full path below.");
@@ -34,7 +34,6 @@ void DrawDialog(bool initial)
         if(inspected.needsManualMode)
         {
             if(ImGui::Button("Confirm Windows mode"))inspected=ResourceCatalog::Inspect(folder,0);
-            ImGui::SameLine();
             if(ImGui::Button("Confirm Full Tilt mode"))inspected=ResourceCatalog::Inspect(folder,1);
         }
         if(inspected.valid)
@@ -45,7 +44,7 @@ void DrawDialog(bool initial)
                 if(catalog->Register(inspected,diagnostic)){registered=true;showImport=false;}
             }
         }
-        if(ImGui::BeginChild("resource-diagnostics",ImVec2(0,0),true))
+        if(ImGui::BeginChild("resource-diagnostics",ImVec2(0,180 * ImGui::GetFontSize() / 13.0f),true))
         {
             for(const auto& warning:inspected.warnings)ImGui::TextWrapped("%s",warning.c_str());
             for(const auto& observation:inspected.observations)ImGui::TextWrapped("%s",observation.c_str());
@@ -97,6 +96,7 @@ bool ResourceImport::RunSetup()
             if(event.type==SDL_QUIT || (event.type==SDL_WINDOWEVENT && event.window.event==SDL_WINDOWEVENT_CLOSE)){showImport=false;break;}
         }
         if(!showImport)break;
+        winmain::UpdateUiScale();
         ImGui_ImplSDL2_NewFrame();ImGui_Render_NewFrame();ImGui::NewFrame();
         DrawDialog(true);ImGui::Render();
         SDL_SetRenderDrawColor(winmain::Renderer,0,0,0,255);SDL_RenderClear(winmain::Renderer);

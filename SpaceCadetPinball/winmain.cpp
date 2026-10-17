@@ -58,6 +58,46 @@ winmain::DurationMs winmain::SpinThreshold = DurationMs(0.005);
 WelfordState winmain::SleepState{};
 int winmain::CursorIdleCounter = 0;
 
+void winmain::ConstrainNextDialog(float width, float height)
+{
+	const auto available = ImGui::GetIO().DisplaySize;
+	const float margin = 8.0f;
+	const ImVec2 maximum(std::max(1.0f, available.x - margin * 2), std::max(1.0f, available.y - margin * 2));
+	const float scale = ImGui::GetFontSize() / 13.0f;
+	ImGui::SetNextWindowSize(ImVec2(std::min(width * scale, maximum.x), std::min(height * scale, maximum.y)), ImGuiCond_Appearing);
+	ImGui::SetNextWindowSizeConstraints(ImVec2(std::min(240.0f, maximum.x), std::min(160.0f, maximum.y)), maximum);
+	ImGui::SetNextWindowPos(ImVec2(available.x * 0.5f, available.y * 0.5f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+}
+
+void winmain::UpdateUiScale()
+{
+	float dpi = 96.0f;
+	SDL_GetDisplayDPI(SDL_GetWindowDisplayIndex(MainWindow), nullptr, &dpi, nullptr);
+	if (!std::isfinite(dpi) || dpi <= 0) dpi = 96.0f;
+	const float scale = Clamp(dpi / 96.0f, 1.0f, 4.0f) * Options.UIScale.V;
+	// Rebuild from unscaled style; repeated monitor moves must not compound scaling.
+	if (std::abs(ImIO->FontGlobalScale - scale * 0.5f) > 0.001f)
+	{
+		ImGui::GetStyle() = ImGuiStyle();
+		ImGui::StyleColorsDark();
+		ImGui::GetStyle().ScaleAllSizes(scale);
+		ImIO->FontGlobalScale = scale * 0.5f;
+	}
+}
+
+void winmain::SetWindowSize(int width, int height)
+{
+	SDL_Rect bounds{};
+	if (SDL_GetDisplayUsableBounds(SDL_GetWindowDisplayIndex(MainWindow), &bounds) == 0)
+	{
+		// Leave room for the title bar and borders, including on a smaller monitor.
+		width = std::min(width, std::max(320, bounds.w - 64));
+		height = std::min(height, std::max(240, bounds.h - 96));
+	}
+	SDL_SetWindowSize(MainWindow, std::max(320, width), std::max(240, height));
+	SDL_SetWindowPosition(MainWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+}
+
 int winmain::WinMain(LPCSTR lpCmdLine)
 {
 	std::set_new_handler(memalloc_failure);
@@ -68,6 +108,10 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 	printf(" SDL_mixer %d.%d.%d;", SDL_MIXER_MAJOR_VERSION, SDL_MIXER_MINOR_VERSION, SDL_MIXER_PATCHLEVEL);
 	printf(" ImGui %s %s\n", IMGUI_VERSION, ImGuiRender);
 
+	// Keep renderer, mouse and window coordinates in physical pixels on Windows.
+#ifdef SDL_HINT_WINDOWS_DPI_AWARENESS
+	SDL_SetHint(SDL_HINT_WINDOWS_DPI_AWARENESS, "permonitorv2");
+#endif
 	// SDL init
 	SDL_SetMainReady();
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO |
@@ -198,17 +242,24 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 			{
 				fclose(fileHandle);
 
-				// ToDo: Bind font size to UI scale
-				if (io.Fonts->AddFontFromFileTTF(fileName, 13.f, &fontConfig, ranges.Data))
+				// Rasterize at twice the base size for readable high-DPI text.
+				if (io.Fonts->AddFontFromFileTTF(fileName, 26.f, &fontConfig, ranges.Data))
 					fontLoaded = true;
 			}
 
 			if (!fontLoaded)
 				printf("Failed to load font: %s, using embedded font.\n", fileName);
-			io.Fonts->Build();
+		}
+		if (io.Fonts->Fonts.empty())
+		{
+			ImFontConfig fontConfig{};
+			fontConfig.SizePixels = 26.f;
+			io.Fonts->AddFontDefault(&fontConfig);
 		}
 		ImGui_Render_Init(renderer);
 		ImGui::StyleColorsDark();
+		io.FontGlobalScale = 0;
+		UpdateUiScale();
 
 		ImGui_ImplSDL2_InitForSDLRenderer(window, Renderer);
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
@@ -266,11 +317,10 @@ int winmain::WinMain(LPCSTR lpCmdLine)
 			Options.FullScreen = true;
 		}
 
-		if (!Options.FullScreen)
-		{
-			auto resInfo = &fullscrn::resolution_array[fullscrn::GetResolution()];
-			SDL_SetWindowSize(MainWindow, resInfo->TableWidth, resInfo->TableHeight);
-		}
+		auto resInfo = &fullscrn::resolution_array[fullscrn::GetResolution()];
+		SetWindowSize(Options.WindowWidth > 0 ? Options.WindowWidth.V : resInfo->TableWidth,
+			Options.WindowHeight > 0 ? Options.WindowHeight.V : resInfo->TableHeight + 32);
+		if (Options.WindowMaximized && !Options.FullScreen) SDL_MaximizeWindow(MainWindow);
 		SDL_SetWindowTitle(MainWindow, ModeSelection::WindowTitle());
 		SDL_ShowWindow(window);
 		fullscrn::set_screen_mode(Options.FullScreen);
@@ -433,6 +483,7 @@ void winmain::MainLoop()
 #endif
 				if (Options.HideCursor && CursorIdleCounter <= 0)
 					ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+				UpdateUiScale();
 				ImGui_ImplSDL2_NewFrame();
 				ImGui_Render_NewFrame();
 				ImGui::NewFrame();
@@ -651,6 +702,22 @@ void winmain::RenderUi()
 
 			if (ImGui::BeginMenu("Graphics"))
 			{
+				if (ImGui::BeginMenu("Window size"))
+				{
+					const int widths[] = {800, 1280, 1920, 2560};
+					for (int width : widths)
+					{
+						char label[40]; snprintf(label, sizeof(label), "%d pixels wide", width);
+						if (ImGui::MenuItem(label))
+						{
+							Options.FullScreen = false; fullscrn::set_screen_mode(0);
+							Options.WindowMaximized = false; SDL_RestoreWindow(MainWindow);
+							auto& res = fullscrn::resolution_array[fullscrn::GetResolution()];
+							SetWindowSize(width, width * res.TableHeight / res.TableWidth + MainMenuHeight);
+						}
+					}
+					ImGui::EndMenu();
+				}
 				if (ImGui::MenuItem(pb::get_rc_string(Msg::Menu1_WindowUniformScale), nullptr, Options.UniformScaling))
 				{
 					options::toggle(Menu1::WindowUniformScale);
@@ -663,11 +730,8 @@ void winmain::RenderUi()
 				{
 					options::toggle(Menu1::WindowIntegerScale);
 				}
-				if (ImGui::DragFloat("UI Scale", &Options.UIScale.V, 0.005f, 0.8f, 5,
-				                     "%.2f", ImGuiSliderFlags_AlwaysClamp))
-				{
-					ImIO->FontGlobalScale = Options.UIScale;
-				}
+				ImGui::DragFloat("UI Scale", &Options.UIScale.V, 0.005f, 0.8f, 3,
+				                     "%.2f", ImGuiSliderFlags_AlwaysClamp);
 				ImGui::Separator();
 
 				char buffer[80]{};
@@ -1064,15 +1128,24 @@ int winmain::event_handler(const SDL_Event* event)
 		case SDL_WINDOWEVENT_FOCUS_LOST:
 		case SDL_WINDOWEVENT_HIDDEN:
 			activated = false;
-			fullscrn::activate(0);
-			Options.FullScreen = false;
+			// Desktop fullscreen remains selected when switching to another app.
 			Sound::Deactivate();
 			midi::music_stop();
 			has_focus = false;
 			pb::loose_focus();
 			break;
+		case SDL_WINDOWEVENT_MAXIMIZED:
+			Options.WindowMaximized = true;
+			break;
+		case SDL_WINDOWEVENT_RESTORED:
+			Options.WindowMaximized = false;
+			break;
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
 		case SDL_WINDOWEVENT_RESIZED:
+			if (!(SDL_GetWindowFlags(MainWindow) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_MINIMIZED)))
+			{
+				SDL_GetWindowSize(MainWindow, &Options.WindowWidth.V, &Options.WindowHeight.V);
+			}
 			fullscrn::window_size_changed();
 			break;
 		default: ;

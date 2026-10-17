@@ -79,9 +79,10 @@ bool ModeSelection::Prepare(const std::vector<const char*>& legacySearchPaths)
             if(event.type==SDL_QUIT || (event.type==SDL_WINDOWEVENT && event.window.event==SDL_WINDOWEVENT_CLOSE))running=false;
         }
         if(!running)break;
+        winmain::UpdateUiScale();
         ImGui_ImplSDL2_NewFrame();ImGui_Render_NewFrame();ImGui::NewFrame();
         bool import=false;
-        ImGui::SetNextWindowSize(ImVec2(620,360),ImGuiCond_FirstUseEver);
+        winmain::ConstrainNextDialog(620,360);
         if(ImGui::Begin("Choose game mode",nullptr,ImGuiWindowFlags_NoCollapse))
         {
             if(!selected.empty())ImGui::TextWrapped("Saved mode: %s. It will not be replaced automatically.",known?ModeName(selected=="full-tilt"):selected.c_str());
@@ -124,11 +125,12 @@ void ModeSelection::DrawMenu()
 void ModeSelection::DrawConfirmation()
 {
     if(requestSwitch){ImGui::OpenPopup("Change game mode?");requestSwitch=false;}
-    if(ImGui::BeginPopupModal("Change game mode?",nullptr,ImGuiWindowFlags_AlwaysAutoResize))
+    winmain::ConstrainNextDialog(620,220);
+    if(ImGui::BeginPopupModal("Change game mode?",nullptr,ImGuiWindowFlags_None))
     {
         ImGui::Text("Start a new %s game?",ModeName(requestedMode));
-        ImGui::TextUnformatted("The current game will end. Its unfinished score will not be recorded.");
-        ImGui::TextUnformatted("Saved high scores are kept separately for each mode.");
+        ImGui::TextWrapped("The current game will end. Its unfinished score will not be recorded.");
+        ImGui::TextWrapped("Saved high scores are kept separately for each mode.");
         if(!failure.empty())ImGui::TextWrapped("%s",failure.c_str());
         if(ImGui::Button("End current game and switch"))
         {
@@ -140,7 +142,6 @@ void ModeSelection::DrawConfirmation()
             pb::BasePath=activePath;pb::DatFileName=activeDat;
             if(selected){ImGui::CloseCurrentPopup();winmain::Restart();}
         }
-        ImGui::SameLine();
         if(ImGui::Button("Keep current game")){ImGui::CloseCurrentPopup();if(!wasPaused)winmain::end_pause();}
         ImGui::EndPopup();
     }

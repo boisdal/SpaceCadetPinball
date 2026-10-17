@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "fullscrn.h"
+#include "DisplayLayout.h"
 
 
 #include "options.h"
@@ -111,34 +112,14 @@ void fullscrn::window_size_changed()
 	int width, height;
 	SDL_GetRendererOutputSize(winmain::Renderer, &width, &height);
 	int menuHeight = options::Options.ShowMenu ? winmain::MainMenuHeight : 0;
-	height -= menuHeight;
-	auto res = &resolution_array[resolution];
-	ScaleX = static_cast<float>(width) / res->TableWidth;
-	ScaleY = static_cast<float>(height) / res->TableHeight;
-	OffsetX = OffsetY = 0;
-	auto offset2X = 0, offset2Y = 0;
-
-	if (options::Options.IntegerScaling)
-	{
-		ScaleX = ScaleX < 1 ? ScaleX : std::floor(ScaleX);
-		ScaleY = ScaleY < 1 ? ScaleY : std::floor(ScaleY);
-	}
-
-	if (options::Options.UniformScaling)
-	{
-		ScaleY = ScaleX = std::min(ScaleX, ScaleY);
-	}
-
-	offset2X = static_cast<int>(floor(width - res->TableWidth * ScaleX));
-	offset2Y = static_cast<int>(floor(height - res->TableHeight * ScaleY));
-	OffsetX = offset2X / 2;
-	OffsetY = offset2Y / 2;
-
-	render::DestinationRect = SDL_Rect
-	{
-		OffsetX, OffsetY + menuHeight,
-		width - offset2X, height - offset2Y
-	};
+	auto& res = resolution_array[resolution];
+	auto layout = display_layout::fit(width, height, menuHeight, res.TableWidth, res.TableHeight,
+		options::Options.UniformScaling, options::Options.IntegerScaling);
+	ScaleX = layout.scaleX;
+	ScaleY = layout.scaleY;
+	OffsetX = layout.x;
+	OffsetY = layout.y - menuHeight;
+	render::DestinationRect = SDL_Rect{layout.x, layout.y, layout.width, layout.height};
 }
 
 SDL_Rect fullscrn::GetScreenRectFromPinballRect(SDL_Rect rect)
