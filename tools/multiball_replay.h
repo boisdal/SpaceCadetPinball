@@ -162,4 +162,3 @@ public:
                 table->MultiballCount,table->BallLockedCounter,table->BallCount,nudge::nudged_right);
     }
 };
-
