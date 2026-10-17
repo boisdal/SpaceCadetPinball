@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "runs": [
+    {
+      "scenario": "weak",
+      "samples": 2160,
+      "pulse_samples": 2,
+      "pulse_first_sample_ms": 4116.666509628,
+      "pulse_last_sample_ms": 4124.999842644,
+      "pulse_boost": 5.0,
+      "pulse_sample_coverage_ms": 16.666666666666668,
+      "executable_sha256": "55a16daf89067608615e370bfa20ff3bff3e60e66e98f62e236cf2f9f2acf9c4",
+      "mode": "windows",
+      "version": "baseline"
+    },
+    {
+      "scenario": "maximum",
+      "samples": 2160,
+      "pulse_samples": 2,
+      "pulse_first_sample_ms": 7016.666399002,
+      "pulse_last_sample_ms": 7024.999732018,
+      "pulse_boost": 100.0,
+      "pulse_sample_coverage_ms": 16.666666666666668,
+      "executable_sha256": "55a16daf89067608615e370bfa20ff3bff3e60e66e98f62e236cf2f9f2acf9c4",
+      "mode": "windows",
+      "version": "baseline"
+    },
+    {
+      "scenario": "automatic",
+      "samples": 2160,
+      "pulse_samples": 2,
+      "pulse_first_sample_ms": 4016.666513443,
+      "pulse_last_sample_ms": 4024.999846458,
+      "pulse_boost": 100.0,
+      "pulse_sample_coverage_ms": 16.666666666666668,
+      "executable_sha256": "55a16daf89067608615e370bfa20ff3bff3e60e66e98f62e236cf2f9f2acf9c4",
+      "mode": "windows",
+      "version": "baseline"
+    },
+    {
+      "scenario": "weak",
+      "samples": 2160,
+      "pulse_samples": 2,
+      "pulse_first_sample_ms": 4116.666509628,
+      "pulse_last_sample_ms": 4124.999842644,
+      "pulse_boost": 5.0,
+      "pulse_sample_coverage_ms": 16.666666666666668,
+      "executable_sha256": "3eb71afc81aa130a012339c326f522122dba4229682c4d53f7edce304ec23ee2",
+      "mode": "windows",
+      "version": "fixed"
+    },
+    {
+      "scenario": "maximum",
+      "samples": 2160,
+      "pulse_samples": 2,
+      "pulse_first_sample_ms": 7016.666399002,
+      "pulse_last_sample_ms": 7024.999732018,
+      "pulse_boost": 100.0,
+      "pulse_sample_coverage_ms": 16.666666666666668,
+      "executable_sha256": "3eb71afc81aa130a012339c326f522122dba4229682c4d53f7edce304ec23ee2",
+      "mode": "windows",
+      "version": "fixed"
+    },
+    {
+      "scenario": "automatic",
+      "samples": 2160,
+      "pulse_samples": 23,
+      "pulse_first_sample_ms": 4016.666513443,
+      "pulse_last_sample_ms": 4199.999839783,
+      "pulse_boost": 100.0,
+      "pulse_sample_coverage_ms": 191.66666666666666,
+      "executable_sha256": "3eb71afc81aa130a012339c326f522122dba4229682c4d53f7edce304ec23ee2",
+      "mode": "windows",
+      "version": "fixed"
+    },
+    {
+      "scenario": "weak",
+      "samples": 2160,
+      "pulse_samples": 2,
+      "pulse_first_sample_ms": 4116.666509628,
+      "pulse_last_sample_ms": 4124.999842644,
+      "pulse_boost": 3.90625,
+      "pulse_sample_coverage_ms": 16.666666666666668,
+      "executable_sha256": "55a16daf89067608615e370bfa20ff3bff3e60e66e98f62e236cf2f9f2acf9c4",
+      "mode": "full-tilt",
+      "version": "baseline"
+    },
+    {
+      "scenario": "maximum",
+      "samples": 2160,
+      "pulse_samples": 2,
+      "pulse_first_sample_ms": 7016.666399002,
+      "pulse_last_sample_ms": 7024.999732018,
+      "pulse_boost": 50.0,
+      "pulse_sample_coverage_ms": 16.666666666666668,
+      "executable_sha256": "55a16daf89067608615e370bfa20ff3bff3e60e66e98f62e236cf2f9f2acf9c4",
+      "mode": "full-tilt",
+      "version": "baseline"
+    },
+    {
+      "scenario": "automatic",
+      "samples": 2160,
+      "pulse_samples": 2,
+      "pulse_first_sample_ms": 4016.666513443,
+      "pulse_last_sample_ms": 4024.999846458,
+      "pulse_boost": 50.0,
+      "pulse_sample_coverage_ms": 16.666666666666668,
+      "executable_sha256": "55a16daf89067608615e370bfa20ff3bff3e60e66e98f62e236cf2f9f2acf9c4",
+      "mode": "full-tilt",
+      "version": "baseline"
+    },
+    {
+      "scenario": "weak",
+      "samples": 2160,
+      "pulse_samples": 2,
+      "pulse_first_sample_ms": 4116.666509628,
+      "pulse_last_sample_ms": 4124.999842644,
+      "pulse_boost": 3.90625,
+      "pulse_sample_coverage_ms": 16.666666666666668,
+      "executable_sha256": "3eb71afc81aa130a012339c326f522122dba4229682c4d53f7edce304ec23ee2",
+      "mode": "full-tilt",
+      "version": "fixed"
+    },
+    {
+      "scenario": "maximum",
+      "samples": 2160,
+      "pulse_samples": 2,
+      "pulse_first_sample_ms": 7016.666399002,
+      "pulse_last_sample_ms": 7024.999732018,
+      "pulse_boost": 50.0,
+      "pulse_sample_coverage_ms": 16.666666666666668,
+      "executable_sha256": "3eb71afc81aa130a012339c326f522122dba4229682c4d53f7edce304ec23ee2",
+      "mode": "full-tilt",
+      "version": "fixed"
+    },
+    {
+      "scenario": "automatic",
+      "samples": 2160,
+      "pulse_samples": 2,
+      "pulse_first_sample_ms": 4016.666513443,
+      "pulse_last_sample_ms": 4024.999846458,
+      "pulse_boost": 50.0,
+      "pulse_sample_coverage_ms": 16.666666666666668,
+      "executable_sha256": "3eb71afc81aa130a012339c326f522122dba4229682c4d53f7edce304ec23ee2",
+      "mode": "full-tilt",
+      "version": "fixed"
+    }
+  ],
+  "comparisons": [
+    {
+      "mode": "windows",
+      "scenario": "weak",
+      "physics_equal": true,
+      "physics_baseline_sha256": "a087a0229f7196218fddb5de2d7e9df6c18086814e1c3f85150846d677d0c97b",
+      "physics_fixed_sha256": "a087a0229f7196218fddb5de2d7e9df6c18086814e1c3f85150846d677d0c97b",
+      "trajectory_equal": true,
+      "trajectory_baseline_sha256": "2f6361943904d5b75477118c3f60e93918601cf867f1eb0a67cbbcc246e9e454",
+      "trajectory_fixed_sha256": "2f6361943904d5b75477118c3f60e93918601cf867f1eb0a67cbbcc246e9e454"
+    },
+    {
+      "mode": "windows",
+      "scenario": "maximum",
+      "physics_equal": true,
+      "physics_baseline_sha256": "77bf011a6c3c3d827374ebee446e71aec9bfe85f3cffa24239689d39b34983fa",
+      "physics_fixed_sha256": "77bf011a6c3c3d827374ebee446e71aec9bfe85f3cffa24239689d39b34983fa",
+      "trajectory_equal": true,
+      "trajectory_baseline_sha256": "f5e19b4202e733bddfb58ef52f35bc50749d0a8d4faf7674d8431bc972a65858",
+      "trajectory_fixed_sha256": "f5e19b4202e733bddfb58ef52f35bc50749d0a8d4faf7674d8431bc972a65858"
+    },
+    {
+      "mode": "windows",
+      "scenario": "automatic",
+      "physics_equal": false,
+      "physics_baseline_sha256": "1a5b56ceae3bf36649774fb31c61c3413b4b9bfbb3a2e3c12ac851221bbba94d",
+      "physics_fixed_sha256": "7bad81d8e7ca932dde7270c8263d5b3cbe427fa7eb774752544f61ca0e5a0124",
+      "trajectory_equal": true,
+      "trajectory_baseline_sha256": "f80159af29ea84306dbb608cf4ec4ab46a6d438d4e9bf67a1dbf343b521da56a",
+      "trajectory_fixed_sha256": "f80159af29ea84306dbb608cf4ec4ab46a6d438d4e9bf67a1dbf343b521da56a"
+    },
+    {
+      "mode": "full-tilt",
+      "scenario": "weak",
+      "physics_equal": true,
+      "physics_baseline_sha256": "0175978239e21485a617dd59f593b4c1a76cef53aecf7a7a2528a1e12884dc88",
+      "physics_fixed_sha256": "0175978239e21485a617dd59f593b4c1a76cef53aecf7a7a2528a1e12884dc88",
+      "trajectory_equal": true,
+      "trajectory_baseline_sha256": "8f90fc508ee4c5bf33719988eea0e00eb403cd175bac9fb69206deb6c769a2ee",
+      "trajectory_fixed_sha256": "8f90fc508ee4c5bf33719988eea0e00eb403cd175bac9fb69206deb6c769a2ee"
+    },
+    {
+      "mode": "full-tilt",
+      "scenario": "maximum",
+      "physics_equal": true,
+      "physics_baseline_sha256": "ad299e2d22e5343d758f6887f083884fac7619b982346e4fa5298741c8ca8e87",
+      "physics_fixed_sha256": "ad299e2d22e5343d758f6887f083884fac7619b982346e4fa5298741c8ca8e87",
+      "trajectory_equal": true,
+      "trajectory_baseline_sha256": "29fb0052277f541b7a030e3ea88fbd754bd7c87ba8d5432b35fc34fff8bb134c",
+      "trajectory_fixed_sha256": "29fb0052277f541b7a030e3ea88fbd754bd7c87ba8d5432b35fc34fff8bb134c"
+    },
+    {
+      "mode": "full-tilt",
+      "scenario": "automatic",
+      "physics_equal": true,
+      "physics_baseline_sha256": "8b0657f44a286f0370f0475d010d23fcb25a017993d0e2e9c283c5bebf57d17f",
+      "physics_fixed_sha256": "8b0657f44a286f0370f0475d010d23fcb25a017993d0e2e9c283c5bebf57d17f",
+      "trajectory_equal": true,
+      "trajectory_baseline_sha256": "bb84e0eccd38bd837b2f7a95a16df2069fa6d554d5040e6b2b8f4b8a59f2aee9",
+      "trajectory_fixed_sha256": "bb84e0eccd38bd837b2f7a95a16df2069fa6d554d5040e6b2b8f4b8a59f2aee9"
+    }
+  ],
+  "limit": "Fork before/after comparison, not original trajectory equivalence."
+}
