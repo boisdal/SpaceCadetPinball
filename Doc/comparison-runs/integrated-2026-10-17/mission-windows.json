@@ -1,0 +1,31 @@
+{
+  "executable_sha256": "74d80320c03c0c9a593fad82b42536af803d90b40e342de28528eaf6ec110f6c",
+  "driver": "SDL dummy video/audio; noaudio",
+  "exit_code": 0,
+  "checks": [
+    "mission_replay:PASS:two-player game initialized",
+    "mission_replay:PASS:mission start gives no replay",
+    "mission_replay:PASS:terminal mission lamp matches mode",
+    "mission_replay:PASS:terminal mission message matches mode",
+    "mission_replay:PASS:player two does not inherit replay",
+    "mission_replay:PASS:player one replay restored",
+    "mission_replay:PASS:ball active before drain",
+    "mission_replay:PASS:real drain component",
+    "mission_replay:PASS:drain consumes replay and arms ball save",
+    "mission_replay:PASS:replay preserves player and balls",
+    "mission_replay:PASS:replay ball message queued",
+    "mission_replay:PASS:real drain and plunger timers feed replay ball",
+    "mission_replay:PASS:real tilt lock active",
+    "mission_replay:PASS:ball active before drain",
+    "mission_replay:PASS:real drain component",
+    "mission_replay:PASS:tilt cancels replay",
+    "mission_replay:PASS:tilted loss decrements player one and switches to player two",
+    "mission_replay:PASS:real timers feed next player ball",
+    "mission_replay:PASS:next player has no replay",
+    "mission_replay:COMPLETE"
+  ],
+  "resources_sha256": {
+    "font.dat": "ba89418be9aed5d7f5bc197c00fab4cacf3aff23a1ddc0de134010414acf2d0b",
+    "pinball.dat": "42defd5d2a339a3953fe643716aff4e35b2cea7a3e54505c82d1e78d5325bc04"
+  }
+}
