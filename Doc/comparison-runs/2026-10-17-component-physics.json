@@ -1,0 +1,380 @@
+{
+  "schema_version": 1,
+  "xp_exe_sha256": "2bbc8234685fe2f6324040af6ea20123cf00c4a56882ce0d9074f0beefac67bc",
+  "method": "hash-gated static PE/DAT inspection; no game execution",
+  "xp_constants": {
+    "hole_capture_delay_seconds": 0.5,
+    "hole_missing_attribute_701_default": 0.5,
+    "kickout_default_delay_seconds": 1.5,
+    "kickout_rearm_delay_seconds": 0.05000000074505806,
+    "kickout_tilt_delay_seconds": 0.10000000149011612,
+    "flipper_base_radius_guard_multiplier": 1.01
+  },
+  "xp_method_addresses": {
+    "hole_collision": "0x1018476",
+    "hole_field": "0x10169c0",
+    "kickout_collision": "0x1016745",
+    "kickout_release": "0x10167dd",
+    "throw_ball": "0x1015935",
+    "flipper_edge_constructor": "0x101c2ba",
+    "flipper_edge_collision": "0x101be06"
+  },
+  "data": [
+    {
+      "reference": "windows-xp-x86-en",
+      "sha256": "42defd5d2a339a3953fe643716aff4e35b2cea7a3e54505c82d1e78d5325bc04",
+      "components": {
+        "ramp_hole": {
+          "group_index": 104,
+          "attributes": {
+            "408": [
+              5.870173931121826,
+              7.607635974884033,
+              0.3257719874382019,
+              0.0
+            ],
+            "1304": [
+              1.0
+            ],
+            "306": [
+              0.10000000149011612
+            ],
+            "305": [
+              10.0
+            ],
+            "701": [
+              0.20000000298023224
+            ],
+            "407": [
+              0.05000000074505806
+            ]
+          }
+        },
+        "table": {
+          "group_index": 107,
+          "attributes": {
+            "305": [
+              25.0,
+              0.5,
+              1.570796012878418
+            ],
+            "701": [
+              0.20000000298023224
+            ]
+          }
+        },
+        "a_flip1": {
+          "group_index": 355,
+          "attributes": {
+            "800": [
+              2.4888150691986084,
+              12.06305980682373,
+              0.31098100543022156,
+              -1.0
+            ],
+            "801": [
+              0.9613149762153625,
+              13.130958557128906,
+              0.1933079957962036,
+              -1.0
+            ],
+            "802": [
+              0.9613149762153625,
+              11.006569862365723,
+              0.1933079957962036,
+              -1.0
+            ],
+            "804": [
+              0.03999999910593033
+            ],
+            "805": [
+              0.07999999821186066
+            ],
+            "803": [
+              0.8999999761581421
+            ]
+          }
+        },
+        "a_flip2": {
+          "group_index": 363,
+          "attributes": {
+            "800": [
+              -2.489000082015991,
+              12.06305980682373,
+              0.31098100543022156,
+              -1.0
+            ],
+            "801": [
+              -0.9610000252723694,
+              13.130958557128906,
+              0.1933079957962036,
+              -1.0
+            ],
+            "802": [
+              -0.9610000252723694,
+              11.006569862365723,
+              0.1933079957962036,
+              -1.0
+            ],
+            "804": [
+              0.03999999910593033
+            ],
+            "805": [
+              0.07999999821186066
+            ],
+            "803": [
+              0.8999999761581421
+            ]
+          }
+        },
+        "a_kout1": {
+          "group_index": 510,
+          "attributes": {
+            "306": [
+              0.05000000074505806
+            ],
+            "305": [
+              30.0
+            ],
+            "408": [
+              0.0,
+              0.0,
+              0.30000001192092896
+            ]
+          }
+        },
+        "a_kout2": {
+          "group_index": 512,
+          "attributes": {
+            "306": [
+              0.8999999761581421
+            ],
+            "305": [
+              32.0
+            ],
+            "408": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "a_kout3": {
+          "group_index": 514,
+          "attributes": {
+            "306": [
+              0.20000000298023224
+            ],
+            "305": [
+              32.0
+            ],
+            "408": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "reference": "full-tilt-win95-en",
+      "sha256": "d4b85b0cc0cb05e4be49bf4a5a56e65be8514c854c0f718180845cb07f272ee3",
+      "components": {
+        "ramp_hole": {
+          "group_index": 209,
+          "attributes": {
+            "408": [
+              5.870173931121826,
+              7.607635974884033,
+              0.3257719874382019,
+              0.0
+            ],
+            "1304": [
+              0.0
+            ],
+            "306": [
+              0.10000000149011612
+            ],
+            "305": [
+              10.0
+            ],
+            "703": [
+              0.20000000298023224
+            ],
+            "407": [
+              0.05000000074505806
+            ]
+          }
+        },
+        "table": {
+          "group_index": 212,
+          "attributes": {
+            "305": [
+              25.0,
+              0.5,
+              1.570796012878418
+            ],
+            "703": [
+              0.20000000298023224
+            ],
+            "701": [
+              228.0,
+              297.0
+            ]
+          }
+        },
+        "a_flip1": {
+          "group_index": 474,
+          "attributes": {
+            "800": [
+              2.4888150691986084,
+              12.06305980682373,
+              0.31098100543022156,
+              -1.0
+            ],
+            "801": [
+              0.9613149762153625,
+              13.130958557128906,
+              0.1933079957962036,
+              -1.0
+            ],
+            "802": [
+              0.9613149762153625,
+              11.006569862365723,
+              0.1933079957962036,
+              -1.0
+            ],
+            "804": [
+              30.3799991607666
+            ],
+            "805": [
+              15.1899995803833
+            ],
+            "803": [
+              0.8999999761581421
+            ]
+          }
+        },
+        "a_flip2": {
+          "group_index": 482,
+          "attributes": {
+            "800": [
+              -2.489000082015991,
+              12.06305980682373,
+              0.31098100543022156,
+              -1.0
+            ],
+            "801": [
+              -0.9610000252723694,
+              13.130958557128906,
+              0.1933079957962036,
+              -1.0
+            ],
+            "802": [
+              -0.9610000252723694,
+              11.006569862365723,
+              0.1933079957962036,
+              -1.0
+            ],
+            "804": [
+              30.3799991607666
+            ],
+            "805": [
+              15.1899995803833
+            ],
+            "803": [
+              0.8999999761581421
+            ]
+          }
+        },
+        "a_kout1": {
+          "group_index": 627,
+          "attributes": {
+            "306": [
+              0.05000000074505806
+            ],
+            "305": [
+              30.0
+            ],
+            "408": [
+              0.0,
+              0.0,
+              0.0,
+              0.30000001192092896
+            ]
+          }
+        },
+        "a_kout2": {
+          "group_index": 629,
+          "attributes": {
+            "306": [
+              0.8999999761581421
+            ],
+            "305": [
+              32.0
+            ],
+            "408": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "a_kout3": {
+          "group_index": 631,
+          "attributes": {
+            "306": [
+              0.20000000298023224
+            ],
+            "305": [
+              32.0
+            ],
+            "408": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "flippers": [
+    {
+      "name": "a_flip1",
+      "geometry_equal": true,
+      "angle_radians_derived_double": 1.2152294810455773,
+      "angle_degrees_derived_double": 69.62752040378484,
+      "collision_multiplier_xp": 0.8999999761581421,
+      "collision_multiplier_ft": 0.8999999761581421,
+      "xp_extend_seconds": 0.03999999910593033,
+      "xp_retract_seconds": 0.07999999821186066,
+      "xp_extend_radians_per_second_derived_double": 30.380737705201835,
+      "xp_retract_radians_per_second_derived_double": 15.190368852600917,
+      "ft_extend_radians_per_second": 30.3799991607666,
+      "ft_retract_radians_per_second": 15.1899995803833
+    },
+    {
+      "name": "a_flip2",
+      "geometry_equal": true,
+      "angle_radians_derived_double": -1.2149227174913126,
+      "angle_degrees_derived_double": -69.60994414681706,
+      "collision_multiplier_xp": 0.8999999761581421,
+      "collision_multiplier_ft": 0.8999999761581421,
+      "xp_extend_seconds": 0.03999999910593033,
+      "xp_retract_seconds": 0.07999999821186066,
+      "xp_extend_radians_per_second_derived_double": 30.373068616173803,
+      "xp_retract_radians_per_second_derived_double": 15.186534308086902,
+      "ft_extend_radians_per_second": 30.3799991607666,
+      "ft_retract_radians_per_second": 15.1899995803833
+    }
+  ],
+  "limits": [
+    "Derived angles use Python double precision, not an original runtime sample",
+    "Matching parameters do not prove matching collision timing or ball trajectories",
+    "Original missing-attribute default differs but is unused by the authenticated XP DAT"
+  ]
+}

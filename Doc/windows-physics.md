@@ -114,6 +114,49 @@ sont compilés avec Zig 0.13.0, SDL 2.30.11 et SDL_mixer 2.8.0.
 
 ## Suite de la comparaison
 
+### Seconde passe statique : composants et paramètres
+
+La [preuve des composants](comparison-runs/2026-10-17-component-physics.json)
+croise le binaire XP authentifié, les deux DAT authentifiés et la lecture du
+code courant (base `d816252`). Aucun nouveau réglage du moteur n'est modifié
+à l'issue de cette passe.
+
+```powershell
+python tools/inspect_physics_components.py --xp-exe <XP>/pinball.exe --xp-dat <XP>/pinball.dat --ft-dat <FT>/CADET.DAT --output components.json
+```
+
+| Vérification | Preuve XP / données | Lecture du fork | Conclusion limitée |
+|---|---|---|---|
+| Géométrie des flippers | Attributs 800/801/802 strictement identiques dans les deux DAT | Origine et positions initiale/finale conservées, angle signé calculé par produit scalaire/croisé | Pas de géométrie FT incorrectement substituée à XP |
+| Durée du mouvement | XP 804 = 0,04 s ; 805 = 0,08 s, copiés dans les champs `+0xd5/+0xd9` par `0x101c2ba` | Conversion `abs(angle) / durée` uniquement en Windows | Durées nominales conservées, cadence effective de contact non prouvée |
+| Force du flipper | XP `0x101be06`, notamment `0x101be81–0x101bec5` : distance relative, `abs(angle)/durée`, projection positive, multiplicateur 803 | Même produit scalaire et facteur de vitesse `abs(MoveSpeed)` ; 803 vaut 0,9 dans les deux DAT | Formule de force concordante lorsque les deux solveurs choisissent le même contact et la même branche ; ce choix reste à mesurer |
+| Trou de rampe | Vtable `0x10026ac`, capture `0x1018476`, float 0,5 à `0x10024d0` | Windows 0,5 s ; FT 0 s | Délai Windows déjà correct |
+| Chute dans le trou | `0x10169c0` soustrait gravité × delta × multiplicateur à la vitesse Z, puis ajoute celle-ci à Z | Même ordre dans `THole::FieldEffect` | Pas de modification dimensionnelle improvisée ; ne pas ajouter un second delta sans comparer le moteur complet |
+| Kickout | Vtable `0x1002690`, capture `0x1016745`, libération `0x10167dd` ; 1,5 s par défaut, 0,1 s si tilt, réarmement 0,05 s | Constantes et conditions conservées | Pas de correction du délai sur ces branches |
+| Hauteur des kickouts | XP attribut 408 : troisième valeur ; FT : quatrième valeur | Sélection Windows/FT déjà explicite | Valeurs effectives conformes aux DAT, notamment 0,3 pour `a_kout1` |
+| Éjection aléatoire | `0x1015935` : angle `(1−2u)×angleMult`, vitesse `base+(1−2v)×base×variation` | Même formule dans `TBall::throw_ball` | Ne prouve pas identité du générateur ni de la séquence d'appels |
+
+Les angles déduits des DAT en double précision sont environ +69,62752° et
+−69,60994°. Windows implique donc environ 30,38074 et 30,37307 radians/s à
+l'aller ; le DAT FT donne 30,38 pour les deux. Cette légère asymétrie vient
+des coordonnées d'origine et doit rester conservée. Les chiffres dérivés
+ne sont pas des mesures des positions du binaire en cours d'exécution.
+
+Une différence de code est **sans effet sur la référence retenue** : lorsque
+l'attribut 701 est absent du trou, XP choisit 0,5 (`0x1019a83`), alors que le
+fork utilise 0,2 depuis `49f6132`. Cependant `ramp_hole` du DAT XP fournit
+explicitement 701 = 0,2. Changer ce défaut ne corrigerait donc aucune trajectoire
+XP observée ici. Le DAT FT emploie 703 = 0,2 ; le fork retombe sur son défaut
+0,2 pour ce composant. Une généralisation à des données modifiées n'est pas
+incluse dans #26.
+
+Le remplacement du solveur temporel XP par le solveur FT peut toujours changer
+le moment ou le côté d'un contact, et donc la branche de réponse choisie. Une
+égalité de coefficient ou de formule ne démontre pas l'égalité du contact.
+Les rebonds et transitions de plans des rampes n'ont pas été validés par cette
+passe ciblée. Les captures historiques et les essais comparatifs restent
+nécessaires avant une autre correction.
+
 La comparaison historique doit contrôler la cadence et le générateur aléatoire,
 séparer les tirs manuels de la commande automatique et aligner les événements
 de collision. Sur la référence et le fork : relever lancement faible/maximal,
