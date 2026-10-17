@@ -84,8 +84,13 @@ On Windows, 17 October 2026:
   The isolated registry retains the source after normal shutdown. Adding Full
   Tilt through the in-game form recognizes and retains the second source while
   preserving the current paused Windows game; both locations survive restart.
-  Unknown variants, incomplete folders and repair are covered by the automated
-  catalog tests above; their interactive form remains a separate desktop check.
+  A separate desktop pass with a copied XP DAT whose description byte was changed
+  confirmed the unknown fingerprint warning, explicit Windows mode confirmation,
+  retained unknown provenance, registration despite named missing-audio warnings,
+  table initialization and direct restart in the saved mode. An empty folder
+  first produced named missing-DAT errors; correcting its path allowed retry.
+  See `comparison-runs/2026-10-17-issue30-unknown-ui.json`. Original files were
+  unchanged. This does not authenticate arbitrary unknown variants.
 
 Compile `tests/resource_catalog_test.cpp` with C++11, then run:
 
