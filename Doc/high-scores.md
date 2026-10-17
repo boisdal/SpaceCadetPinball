@@ -56,6 +56,13 @@ Exécuté le 17 octobre 2026 avec Zig 0.13.0, SDL 2.30.11 et SDL_mixer 2.8.0 :
 les trois étapes et le test unitaire passent. La compilation complète du jeu
 avec le script `tools/build_comparison_windows.ps1` réussit également.
 
+Contrôle visuel du 17 octobre 2026 sur ce build, avec une copie des préférences
+synthétiques : le tableau Windows effacé est vide, le tableau Full Tilt affiche
+« FT player » à 2 000 000, et la vue héritée affiche « Legacy player » à 3 000 000
+sans bouton d'effacement. Les deux éditions ont été lancées avec leurs ressources
+locales ; aucun record utilisateur n'a été utilisé. Ce contrôle vérifie l'affichage,
+pas la saisie d'un score gagné en partie.
+
 La vérification interactive complémentaire consiste à saisir un record dans
 chaque mode, quitter normalement et relancer ; consulter les records hérités,
 puis effacer un tableau courant et vérifier que l'autre tableau et l'archive
